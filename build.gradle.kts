@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     testImplementation("net.jqwik:jqwik-kotlin:1.6.0-SNAPSHOT")
     testImplementation("org.assertj:assertj-core:3.21.0")
     testImplementation("io.kotest:kotest-runner-junit5:4.6.3")
@@ -26,7 +27,13 @@ dependencies {
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        include("net/**/*Properties.class")
+        include("net/**/*Example.class")
+        include("net/**/*Examples.class")
+        include("net/**/*Test.class")
+        include("net/**/*Tests.class")
+    }
 }
 
 tasks.withType<KotlinCompile> {
@@ -35,7 +42,7 @@ tasks.withType<KotlinCompile> {
 			"-Xjsr305=strict", // Required for strict interpretation of
 			"-Xemit-jvm-type-annotations" // Required for annotations on type variables
 		)
-        jvmTarget = "17" // 1.8 or above
+        jvmTarget = "16" // 1.8 or above
         javaParameters = true // Required to get correct parameter names in reporting
     }
 }
