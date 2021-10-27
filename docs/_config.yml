@@ -1,1 +1,3 @@
 theme: jekyll-theme-cayman
+title: "Property-based Testing in Kotlin"
+description: "How to do Property-based Testing in Kotlin. Mostly using jqwik."
