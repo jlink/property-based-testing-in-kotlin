@@ -22,21 +22,24 @@ You can find [all code examples on github](https://github.com/jlink/property-bas
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Table of Contents  
 
-- [A Very Short Intro to PBT](#a-very-short-intro-to-pbt)
+- [A Short Intro to PBT](#a-short-intro-to-pbt)
 - [Jqwik, JUnit Platform and Kotlin](#jqwik-junit-platform-and-kotlin)
 - [Setting Up Jqwik](#setting-up-jqwik)
-  - [Gradle](#gradle)
-  - [Maven](#maven)
-- [Jqwik's Kotlin Support](#jqwiks-kotlin-support)
+- [Special Kotlin Support](#special-kotlin-support)
+  - [Compatibility](#compatibility)
+  - [Nullability](#nullability)
+  - [Convenience Methods](#convenience-methods)
+  - [Testing of Asynchronous Code](#testing-of-asynchronous-code)
+  - [Quirks](#quirks)
 - [Alternatives to jqwik](#alternatives-to-jqwik)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## A Very Short Intro to PBT
+## A Short Intro to PBT
 
 You all know example-based tests, e.g. using JUnit Jupiter:
 
-```Kotlin
+```kotlin
 @Test
 fun `any list with elements can be reversed`() {
    val original : List<Int> = listOf(1, 2, 3)
@@ -79,7 +82,7 @@ fun `reversing swaps first and last`(@ForAll @Size(min=2) list: List<Int>) {
 
 To be frank, the _Reverse List_ example is probably the most common and also the most boring one. 
 If this is your first encounter with PBT, you should definitely get more motivation from other stories.
-Here are some better ones:
+Here are some articles, two of which from myself:
 
 - [In praise of property-based testing](https://increment.com/testing/in-praise-of-property-based-testing/)
 - [Know for Sure](https://blogs.oracle.com/javamagazine/post/know-for-sure-with-property-based-testing)
@@ -89,14 +92,73 @@ Here are some better ones:
 ## Jqwik, JUnit Platform and Kotlin
 
 As you have seen above _jqwik_ follows JUnit's lead in using an annotation (`@Property`) 
-to mark plain functions as executable property...
+to mark plain functions as executable property. 
+This is not as common in the Kotlin world as it is in Java, but you all know it from years of JUnit anyway.
+
+Another thing that jqwik does for you is using the types of parameters annotated with `@ForAll`
+to select an appropriate _generator_ for this parameter.
+For example, the parameter `@ForAll aList: List<Int>` will generate lists of `Int` objects for you.
+Many generators come with associated configurator annotations to further restrict and influence them.
+
+Let's look at a more complex property combining all of that:
+
+```kotlin
+@Property(tries = 100)
+fun `can add up to 10 team members to a project`(
+    @ForAll projectName: @NotBlank @NumericChars String,
+    @ForAll emails: @Size(max = 10) @UniqueElements List<@Email String>
+) {
+    val project = Project(projectName)
+    val users = emails.map { User(it) }.toList()
+    for (user in users) {
+        project.addMember(user)
+    }
+    for (user in users) {
+        project.isMember(user)
+    }
+}
+```
+
+In this example you can see that configuration annotations can also be added to type parameters.
+This property also changes the number of _tries_, which is 1000 by default, to 100.
+
+_jqwik_ is not an independent library, but it comes as a _test engine_ for the 
+[JUnit platform](https://junit.org/junit5/docs/current/user-guide/#overview-what-is-junit-5).
+Despite its original focus on Java, jqwik has worked well with Kotlin for a long time.
+As of version `1.6.0` there's an additional Kotlin module which makes the experience even smoother.
 
 ## Setting Up Jqwik
 
-### Gradle
+If you're already using JUnit 5, the set up for jqwik is really easy: 
+Just add a dependency to `jqwik.net:jqwik-kotlin:<version>`. 
+In practice I recommend to add a few compiler options to make your life easier.
+Here's how you can do that in a Gradle Kotlin-based build file:
 
-### Maven
+```
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = listOf(
+		  "-Xjsr305=strict", // Strict interpretation of nullability annotations in jqwik API
+		  "-Xemit-jvm-type-annotations" // Enable nnotations on type variables
+		)
+        jvmTarget = "16" // 1.8 or above
+        javaParameters = true // Get correct parameter names in jqwik reporting
+    }
+}
+```
 
-## Jqwik's Kotlin Support
+See ??? and ??? for full configured examples for Gradle and Maven.
+
+## Special Kotlin Support
+
+### Compatibility
+
+### Nullability
+
+### Convenience Methods
+
+### Testing of Asynchronous Code
+
+### Quirks
 
 ## Alternatives to jqwik
