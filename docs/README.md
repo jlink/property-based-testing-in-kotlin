@@ -157,7 +157,7 @@ for fully configured examples for Gradle and Maven.
 
 The kotlin module has two main goals: 
 Smoothing off some of the rough edges when using the jqwik API in Kotlin 
-and supporting (some of) the new features that Kotlin puts on the table.
+and supporting (some of) the new features that Kotlin brings to the table.
 
 ### Compatibility
 
