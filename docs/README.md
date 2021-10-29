@@ -163,13 +163,17 @@ and supporting (some of) the new features that Kotlin brings to the table.
 
 _jqwik_ is compatible with Kotlin's syntax and its somewhat different view on Java's type system. 
 That means that:
-- You can use functions instead of methods; functions returning `false` indicate a failure. 
+- You can use functions instead of methods; functions returning `false` indicate a failure.
+  Kotlin allows function names with spaces and a few other special characters;
+  you have to use backticks for those names though.
 - You can use all of Kotlin's array and collection types (and have them generated for you).
 - You can use Kotlin function types instead of Java's lambdas and `@Functional` types.
 - You can use `internal` container classes and property methods.
 - You can use Kotlin-style annotations and enums.
 - You can use the different Kotlin constructs (value classes, sealed classes, type aliases etc.)
   as target types for generation or test containers where it makes sense.
+- You can use inner classes to nest test containers. 
+  This requires the `@Group` annotation and also the modifier `inner`.
 
 ### Nullability
 
