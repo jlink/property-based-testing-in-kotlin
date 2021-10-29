@@ -147,7 +147,11 @@ tasks.withType<KotlinCompile> {
 }
 ```
 
-See ??? and ??? for full configured examples for Gradle and Maven.
+See 
+[jqwik-starter-gradle-kotlin](https://github.com/jlink/jqwik-samples/tree/main/jqwik-starter-gradle-kotlin) 
+and
+[jqwik-starter-maven-kotlin](https://github.com/jlink/jqwik-samples/tree/main/jqwik-starter-maven-kotlin)
+for fully configured examples for Gradle and Maven.
 
 ## Special Kotlin Support
 
