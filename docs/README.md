@@ -155,7 +155,21 @@ for fully configured examples for Gradle and Maven.
 
 ## Special Kotlin Support
 
+The kotlin module has two main goals: 
+Smoothing off some of the rough edges when using the jqwik API in Kotlin 
+and supporting (some of) the new features that Kotlin puts on the table.
+
 ### Compatibility
+
+_jqwik_ is compatible with Kotlin's syntax and its somewhat different view on Java's type system. 
+That means that:
+- You can use functions instead of methods; functions returning `false` indicate a failure. 
+- You can use all of Kotlin's array and collection types (and have them generated for you).
+- You can use Kotlin function types instead of Java's lambdas and `@Functional` types.
+- You can use `internal` container classes and property methods.
+- You can use Kotlin-style annotations and enums.
+- You can use the different Kotlin constructs (value classes, sealed classes, type aliases etc.)
+  as target types for generation or test containers where it makes sense.
 
 ### Nullability
 
@@ -163,6 +177,17 @@ for fully configured examples for Gradle and Maven.
 
 ### Testing of Asynchronous Code
 
-### Quirks
+### Constraints and Quirks
+
+Some things are not as smooth (yet) as I'd like them to be.
+For example: Kotlin's unsigned integer types, as well as inline classes, 
+do not show up on Java's byte code side _at all_. 
+That means they are treated naively;
+`UInt` as `Int` and so on, an inlined class as the type it is inlining.
+This means that you cannot write generators for these types, only for their Java counterpart.
+
+Kotlin's support for injecting the correct annotations in the byte code is not perfect yet.
+If you notice that a constraint annotation is sometimes not honoured by the generator,
+this might be an open Kotlin bug.
 
 ## Alternatives to jqwik
