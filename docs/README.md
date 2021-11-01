@@ -192,7 +192,7 @@ That means that:
 - You can use `internal` container classes and property methods.
 - You can use Kotlin-style annotations and enums.
 - You can use the different Kotlin constructs (data classes, sealed classes, type aliases etc.)
-  as target types for generation or test containers where it makes sense.
+  as target types for generation or as test containers where it makes sense.
   As a special trick you can use singleton objects as container classes:
 
   ```kotlin
@@ -217,7 +217,6 @@ That means that:
 
   ```kotlin
   class OuterProperties {
-
     @Property
     fun outerProp() {}
 
