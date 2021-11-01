@@ -4,6 +4,7 @@ import net.jqwik.api.ForAll
 import net.jqwik.api.Property
 import net.jqwik.api.PropertyDefaults
 import net.jqwik.api.constraints.*
+import net.jqwik.kotlin.api.JqwikIntRange
 import java.math.BigDecimal
 
 @PropertyDefaults(tries = 10)
@@ -37,4 +38,7 @@ class PlainJqwikTests {
     @Property
     fun `property with a long name`(@ForAll aNumber: BigDecimal) {
     }
+
+    @Property
+    fun `positive is above 0`(@ForAll @Positive anInt: Int) = anInt > 0
 }

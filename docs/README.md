@@ -164,16 +164,70 @@ and supporting (some of) the new features that Kotlin brings to the table.
 _jqwik_ is compatible with Kotlin's syntax and its somewhat different view on Java's type system. 
 That means that:
 - You can use functions instead of methods; functions returning `false` indicate a failure.
-  Kotlin allows function names with spaces and a few other special characters;
-  you have to use backticks for those names though.
+- Kotlin allows function names - and even class names! - with spaces and a few other special characters;
+  you have to use backticks for those names, though.
+- You can use Kotlin's expression syntax for property functions, 
+  which allows for very concise statements:
+  
+  ```kotlin
+  @Property 
+  fun `positive is above 0`(@ForAll @Positive anInt: Int) = anInt > 0
+  ```
+
 - You can use all of Kotlin's array and collection types (and have them generated for you).
 - You can use Kotlin function types instead of Java's lambdas and `@Functional` types.
+  Thus, the following property works without the need for further configuration:
+
+  ```kotlin
+  @Property
+  fun `all generated functions return a String`(
+    @ForAll func: ((Int, Int) -> String),
+    @ForAll int1: Int,
+    @ForAll int2: Int
+  ) {
+    assertThat(func(int1, int2)).isInstanceOf(String::class.java)
+  }
+  ```
+
 - You can use `internal` container classes and property methods.
 - You can use Kotlin-style annotations and enums.
-- You can use the different Kotlin constructs (value classes, sealed classes, type aliases etc.)
+- You can use the different Kotlin constructs (data classes, sealed classes, type aliases etc.)
   as target types for generation or test containers where it makes sense.
+  As a special trick you can use singleton objects as container classes:
+
+  ```kotlin
+  object MySingletonProperties {
+    @Property
+    fun prop1() {}
+
+    @Property
+    fun prop2() {}
+  }
+  ```
+  
+  In this case the lifecycle changes in so far that all invocations of property methods
+  will share them same singleton instance as `this` reference, 
+  which is similar to Jupiter's `TestInstance.Lifecycle.PER_CLASS`.
+  Sadly, IntelliJ does not recognize Kotlin's `object` definitions as test container classes
+  in the editor.
+  Running them through the project view, however, works as expected.
+
 - You can use inner classes to nest test containers. 
-  This requires the `@Group` annotation and also the modifier `inner`.
+  This requires the `@Group` annotation and also the modifier `inner`
+
+  ```kotlin
+  class OuterProperties {
+
+    @Property
+    fun outerProp() {}
+
+    @Group
+    inner class InnerProperties {
+        @Property
+        fun innerProp() {}
+    }
+  }
+  ```
 
 ### Nullability
 
