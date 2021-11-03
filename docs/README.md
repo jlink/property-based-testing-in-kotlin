@@ -4,7 +4,7 @@ Kotlin is currently the most hyped language on the JVM. With good reason.
 Kotlin is mostly compatible with Java and comes with a nice set of features 
 to make programming on the JVM less burdensome and more functional.
 
-However, there is not much coverage of _Property-based Testing_ (PBT) in Kotlin.
+However, there is not much coverage of _Property-based Testing_ (PBT) focusing on Kotlin.
 Here are some of the few articles and resources I found:
 
 - [A short blog series](https://medium.com/default-to-open/property-based-testing-in-kotlin-part-1-56929927b8b8)
@@ -156,8 +156,8 @@ for fully configured examples for Gradle and Maven.
 ## Special Kotlin Support
 
 The kotlin module has two main goals: 
-Smoothing off some of the rough edges when using the jqwik API in Kotlin 
-and supporting (some of) the new features that Kotlin brings to the table.
+Smoothing off some rough edges when using the jqwik API in Kotlin 
+and supporting (some of) the additional features that Kotlin brings to the table.
 
 ### Compatibility
 
