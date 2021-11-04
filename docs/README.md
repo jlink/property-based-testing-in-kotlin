@@ -11,7 +11,7 @@ Some of the few articles and resources I found are
 - [A chapter of "The Joy of Kotlin"](https://livebook.manning.com/book/the-joy-of-kotlin/b-property-based-testing-in-kotlin/v-8/156)
 
 To fill the gap a bit this article covers the application of PBT in Kotlin 
-using [jqwik's](https://jqwik.net) Kotlin module.
+using [jqwik's](https://jqwik.net) [Kotlin module](https://jqwik.net/docs/snapshot/user-guide.html#kotlin-module).
 
 ### The Code
 
@@ -247,7 +247,7 @@ fun rankings() : Arbitrary<Int> = Int.any(0..1000)
 fun roles() : Arbitrary<String> = Arbitraries.of("dealer", "blind", "standard")
 ```
 
-Having those in place we just combine those three into a provider function for players:
+Having those three in place we just combine them into a provider function for players:
 
 ```kotlin
 @Provide
