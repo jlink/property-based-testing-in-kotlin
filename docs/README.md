@@ -196,12 +196,12 @@ Let's try that with `Player`:
 
 ```kotlin
 @Property
-fun playersFromType(@ForAll("fromType") player: Player) {
+fun playersFromType(@ForAll("playersByType") player: Player) {
     println(player)
 }
 
 @Provide
-fun fromType() : Arbitrary<Player> = forType(Player::class.java)
+fun playersByType() : Arbitrary<Player> = anyForType<Player>()
 ```
 
 In this example you can see how you can tell a parameter to use a generator from a _provider function_:
@@ -210,19 +210,23 @@ position this function in the same container as your property function,
 add annotation `@Provide` to the function
 and use the function's name in the parameter's `ForAll` annotation.
 
-If we run this example the output will look something like
+Often, the explicit return type can be left out since it will be automatically inferred by the Kotlin compiler. 
+Mind that in this exact example either the function's return type or the explicit type parameter
+of `anyForType<Player>()` is necessary.
+
+When we run this example, the output will look something like
 
 ```
-Player(nickname=秨ㅋ綞蛈蒅천綃붯ⷊ䴊츋㗨ঽ䛵粅⟌ఘᘍ슀ΐ읛핢뾴㤅㾣행跎宄඄鬕쮌⳱Ĩ鵤踯ᆋꌿ쫽삾䟨Ǘꇚ㸐둿⼐⃂띵但䋥⢯䫗臼힛⌆, ranking=11322, role=舶紭䜫᤬૚诖녅슎扮葱)
-Player(nickname=蛈蒅천綃붯ⷊ䴊츋, ranking=105341, role= )
-Player(nickname=천綃붯ⷊ, ranking=2147483647, role= )
-Player(nickname=붯ⷊ䴊츋㗨ঽ䛵粅⟌, ranking=-2631, role=㾣행跎)
-Player(nickname=䴊츋㗨ঽ, ranking=1733, role=읛핢뾴㤅)
-Player(nickname=츋㗨ঽ䛵粅⟌, ranking=-2631, role=㾣행跎)
-Player(nickname=㗨ঽ䛵粅⟌ఘᘍ슀, ranking=1439489, role=宄඄)
-Player(nickname=䛵粅⟌ఘᘍ슀ΐ읛핢뾴㤅㾣행跎宄඄鬕쮌⳱Ĩ鵤踯ᆋꌿ쫽삾䟨Ǘꇚ㸐둿⼐⃂띵但䋥⢯䫗臼힛⌆㏋웄쟿噜⟞퓓㫳礇舶紭䜫᤬૚诖녅슎扮葱撾놡Ҷ뤴ꮓᆀ苆蝞覊❖䪹ꀯ焞쐌袩ﹻᝐꖰ枞꠺Ἑ녵飶ᦒｗ疛㵒栶┴㰰讯⟳毤ॳ锭ᆧ螣姗㮚쇭뿉홒㊃ꀴ뾜尀⚀㇕핖邶庡✾䤶ꄉ璜㾧铙ᶳ샬潮ꃌ哰᣼辋Ⅷ兌刂餪翶쪟쩶腂뾰뛕瓸鞈民냑夋ꂟ❩씮ퟙ摸૾睚獧휣ꃽ畔ꪸࡁ먶⽥㟏袘꣒肬끩꿩뗀襤犇᫭ꏪ䎦굴ꮩ⊞歟혊훂왺쫬⩠投苰鹟⊑︉䗳℁旒㮛ឫ愪衈㬢募걹֤쑕०❵毂⑛䕘翞琯첽簍囮藾Լ慻婟뫣犟⟆⁶ፎ擪떏旀椼¤ꤊ翿咢잖趝ᢉᱜ纁틏Ⴧ萚ۊᬙ휘痩뻩븦䧗輮䯟䀺엮Ȣ﮸Ĉ寶倅撿ӗᶗ, ranking=-3183, role= )
-Player(nickname=粅⟌ఘᘍ, ranking=-12, role=행)
-Player(nickname=⟌, ranking=-2631, role=㾣행跎)
+Player(nickname=秨ㅋ綞蛈蒅천綃붯ⷊ䴊츋㗨ঽ䛵粅⟌ఘᘍ슀ΐ읛핢뾴㤅㾣행⢯䫗臼힛⌆, ranking=11322, position=舶紭䜫᤬૚诖녅슎扮葱)
+Player(nickname=蛈蒅천綃붯ⷊ䴊츋, ranking=105341, position= )
+Player(nickname=천綃붯ⷊ, ranking=2147483647, position= )
+Player(nickname=붯ⷊ䴊츋㗨ঽ䛵粅⟌, ranking=-2631, position=㾣행跎)
+Player(nickname=䴊츋㗨ঽ, ranking=1733, position=읛핢뾴㤅)
+Player(nickname=츋㗨ঽ䛵粅⟌, ranking=-2631, position=㾣행跎)
+Player(nickname=㗨ঽ䛵粅⟌ఘᘍ슀, ranking=1439489, position=宄඄)
+Player(nickname=䛵粅⟌ఘᘍ슀ΐ읛핢뾴㤅擪떏旀椼¤ꤊ翿咢잖趝ᢉᱜ纁틏Ⴧ萚ۊᬙ휘痩뻩븦䧗輮䯟䀺엮Ȣ﮸Ĉ寶倅撿ӗᶗ, ranking=-3183, position=痩뻩)
+Player(nickname=粅⟌ఘᘍ, ranking=-12, position=행)
+Player(nickname=⟌, ranking=-2631, position=㾣행跎)
 ...
 ```
 
@@ -230,21 +234,23 @@ Without further information, jqwik will generate
 - an _arbitrary_ string as `nickname` and `role` - even empty strings or unprintable Unicode chars are within range
 - an _arbitrary_ number of type `Int` - negatives and zero are possible
 
+This might be what you want; 
+in many cases, however, allowed values are more restricted than what the plain type can tell us.
+
 #### Choosing Constrained Base Arbitraries
 
-This may be what you want; in most cases, however, allowed values are somewhat restricted.
-Let's assume the following constraints:
+Let's assume the following constraints for a player's attributes:
 - Nicknames must have a length of 1 to 12 characters.
-- Nickname characters can be any English upper or lowercase letters as well as digits `0` to `9`.
-- The ranking is between `0` and `999`.
-- There are only three possible roles: `dealer`, `blind`, `standard`
+- Nicknames can contain English upper and lowercase letters as well as the digits `0` to `9`.
+- A player's ranking is between `0` and `999`.
+- There are only three possible roles: `dealer`, `forehand`, `middlehand`
 
 This is all we need to know to come up with the three base generators:
 
 ```kotlin
 fun nicknames() : Arbitrary<String> = String.any().alpha().numeric().ofLength(1..12)
 fun rankings() : Arbitrary<Int> = Int.any(0..1000)
-fun roles() : Arbitrary<String> = Arbitraries.of("dealer", "blind", "standard")
+fun roles() : Arbitrary<String> = Arbitraries.of("dealer", "forehand", "middlehand")
 ```
 
 Having those three in place we just combine them into a provider function for players:
@@ -266,16 +272,16 @@ fun validPlayers(@ForAll("players") player: Player) {
 produces something more to our liking:
 
 ```
-Player(nickname=a, ranking=2, role=dealer)
-Player(nickname=A, ranking=0, role=dealer)
-Player(nickname=z, ranking=0, role=dealer)
-Player(nickname=RwClZUm7fPQ, ranking=1000, role=blind)
-Player(nickname=7ggjAy1RK, ranking=721, role=blind)
-Player(nickname=z, ranking=0, role=dealer)
-Player(nickname=TyfnGRbpqav1, ranking=234, role=dealer)
-Player(nickname=TGuRgQ1MO03, ranking=2, role=dealer)
-Player(nickname=0, ranking=38, role=dealer)
-Player(nickname=5F, ranking=5, role=standard)
+Player(nickname=a, ranking=2, position=dealer)
+Player(nickname=A, ranking=0, position=dealer)
+Player(nickname=z, ranking=0, position=dealer)
+Player(nickname=RwClZUm7fPQ, ranking=1000, position=forehand)
+Player(nickname=7ggjAy1RK, ranking=721, position=forehand)
+Player(nickname=z, ranking=0, position=dealer)
+Player(nickname=TyfnGRbpqav1, ranking=234, position=dealer)
+Player(nickname=TGuRgQ1MO03, ranking=2, position=dealer)
+Player(nickname=0, ranking=38, position=dealer)
+Player(nickname=5F, ranking=5, position=middlehand)
 ...
 ```
 
