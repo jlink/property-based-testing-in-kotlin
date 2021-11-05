@@ -181,7 +181,7 @@ Let's look at how to build an arbitrary for the following type,
 which is supposed to represent participants of a card game:
 
 ```kotlin
-data class Player(val nickname: String, val ranking: Int, val role: String)
+data class Player(val nickname: String, val ranking: Int, val postion: String)
 ```
 
 I've chosen to use a data class here to make the code compact, not because it's necessarily the best option.
@@ -189,7 +189,7 @@ Using a fully fledged class would not change the approach towards building a gen
 
 #### Generate by Type
 
-A `Player` has a nickname of type `String`, a ranking of type `Int` and a role that's also a `String`.
+A `Player` has a nickname of type `String`, a ranking of type `Int` and a position that's also a `String`.
 When all underlying types are built into jqwik (or made known to jqwik) there's a very simple way 
 for generating instances of a given type by using `Arbitraries.forType(Class<T>)`.
 Let's try that with `Player`:
@@ -231,11 +231,11 @@ Player(nickname=⟌, ranking=-2631, position=㾣행跎)
 ```
 
 Without further information, jqwik will generate 
-- an _arbitrary_ string as `nickname` and `role` - even empty strings or unprintable Unicode chars are within range
+- an _arbitrary_ string as `nickname` and `position` - even empty strings or unprintable Unicode chars are within range
 - an _arbitrary_ number of type `Int` - negatives and zero are possible
 
 This might be what you want; 
-in many cases, however, allowed values are more restricted than what the plain type can tell us.
+in many cases, however, meaningful values are more restricted than what the plain Kotlin or Java type can tell us.
 
 #### Choosing Constrained Base Arbitraries
 
@@ -243,21 +243,28 @@ Let's assume the following constraints for a player's attributes:
 - Nicknames must have a length of 1 to 12 characters.
 - Nicknames can contain English upper and lowercase letters as well as the digits `0` to `9`.
 - A player's ranking is between `0` and `999`.
-- There are only three possible roles: `dealer`, `forehand`, `middlehand`
+- There are only three possible positions: `dealer`, `forehand` and `middlehand`
 
 This is all we need to know to come up with the three base generators:
 
 ```kotlin
 fun nicknames() : Arbitrary<String> = String.any().alpha().numeric().ofLength(1..12)
 fun rankings() : Arbitrary<Int> = Int.any(0..1000)
-fun roles() : Arbitrary<String> = Arbitraries.of("dealer", "forehand", "middlehand")
+fun positions() : Arbitrary<String> = Arbitraries.of("dealer", "forehand", "middlehand")
 ```
 
 Having those three in place we just combine them into a provider function for players:
 
 ```kotlin
 @Provide
-fun players() = combine(nicknames(), rankings(), roles()) {ni, ra, ro -> Player(ni, ra, ro)}
+fun players() = combine(nicknames(), rankings(), positions()) {n, r, p -> Player(n, r, p)}
+```
+
+or even more compact, but less readable:
+
+```kotlin
+@Provide
+fun players() = combine(nicknames(), rankings(), positions(), ::Player)
 ```
 
 Running now the property

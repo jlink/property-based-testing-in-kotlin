@@ -23,7 +23,8 @@ class PlayerGeneratorsExamples {
     }
 
     @Provide
-    fun players() = combine(nicknames(), rankings(), positions()) { n, r, p -> Player(n, r, p)}
+    fun players() = combine(nicknames(), rankings(), positions(), ::Player)
+    //    fun players() = combine(nicknames(), rankings(), positions()) { n, r, p -> Player(n, r, p)}
 
     fun nicknames() : Arbitrary<String> = String.any().alpha().numeric().ofLength(1..12)
 
