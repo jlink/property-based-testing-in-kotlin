@@ -47,6 +47,6 @@ class TransformationExamples {
     }
 
     @Provide
-    fun arrayOfDoubles() = Double.any().array<Double, Array<Double>>()
+    fun arrayOfDoubles() = Double.any().array<Double, Array<Double>>().ofSize(10)
     //fun arrayOfDoubles() = Double.any().array(Array<Double>::class.java).ofSize(10)
 }

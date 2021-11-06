@@ -422,10 +422,11 @@ Due to the existence of primitive array types in Java, the creation of arrays re
 Double.any().array(Array<Double>::class.java).ofSize(10)
 ```
 
-In Kotlin we have a bit more flexibility, so here's the version using reified types:
+In Kotlin, we have a bit more flexibility, so here's the version using reified types,
+which saves you two characters:
 
 ```kotlin
-Double.any().array<Double, Array<Double>>()
+Double.any().array<Double, Array<Double>>().ofSize(10)
 ```
 
 You decide which one you prefer.
