@@ -29,7 +29,14 @@ You can find [all code examples on github](https://github.com/jlink/property-bas
   - [Programming Generators](#programming-generators)
     - [Generate by Type](#generate-by-type)
     - [Choosing Constrained Base Arbitraries](#choosing-constrained-base-arbitraries)
-  - [Combining Arbitraries](#combining-arbitraries)
+  - [Configuring, Transforming and Combining Arbitraries](#configuring-transforming-and-combining-arbitraries)
+    - [Configuration through Annotation](#configuration-through-annotation)
+    - [Configuration through Fluent API](#configuration-through-fluent-api)
+  - [Transforming Individual Arbitraries](#transforming-individual-arbitraries)
+    - [Filtering](#filtering)
+    - [Mapping](#mapping)
+    - [Creating Collections and other Multi-Value Types](#creating-collections-and-other-multi-value-types)
+    - [Flat Mapping](#flat-mapping)
 - [Special Kotlin Support](#special-kotlin-support)
   - [Compatibility](#compatibility)
   - [Nullability](#nullability)
@@ -292,7 +299,139 @@ Player(nickname=5F, ranking=5, position=middlehand)
 ...
 ```
 
-### Combining Arbitraries
+### Configuring, Transforming and Combining Arbitraries
+
+With the `combine` function we have already seen one of the fundamental ways to use an arbitrary (or several)
+in order to arrive at another one.
+There's much more, though.
+
+#### Configuration through Annotation
+
+The simplest way to influence what your generators produce is by using specific annotations,
+the purpose of which is to provide information about constraints.
+You have already seen a few of those annotations:
+- `@Size` can constraining the size of multi-value types like `List`, `Set`, arrays and others.
+- `@NotBlank` tells String generators to never generate blank Strings (empty or whitespace only).
+
+There's many of them; and their number is constantly growing.
+They are described in the user guide's chapter on [Constraining Default Generation](https://jqwik.net/docs/current/user-guide.html#constraining-default-generation).
+
+
+#### Configuration through Fluent API
+
+When you provide generators programmatically, though, annotations are of no help.
+That's why most built-in arbitrary types come with a fluent configuration API.
+Let's take String generation as an example:
+
+```java
+public interface StringArbitrary extends Arbitrary<String> {
+	StringArbitrary ofMaxLength(int maxLength);
+	StringArbitrary ofMinLength(int minLength);
+	StringArbitrary ofLength(int length);
+	StringArbitrary withChars(char... chars);
+	StringArbitrary withChars(CharSequence chars);
+	StringArbitrary withCharRange(char from, char to);
+	StringArbitrary ascii();
+	StringArbitrary alpha();
+	StringArbitrary numeric();
+	StringArbitrary whitespace();
+	StringArbitrary all();
+	StringArbitrary excludeChars(char ... charsToExclude);
+	StringArbitrary withLengthDistribution(RandomDistribution lengthDistribution);
+	Arbitrary<String> repeatChars(double repeatProbability);
+}
+```
+
+Creating an arbitrary for Strings of length 2 to 42 with just ascii chars looks like:
+
+```kotlin
+Arbitraries.strings().ascii().ofMinLength(2).ofMaxLength(42)
+```
+
+The Kotlin module often adds extension functions to make using the API smoother.
+Thus, we can rewrite the code above as:
+
+```kotlin
+String.any().ascii().ofLength(2..42)
+```
+
+You'll find configurable arbitraries for Strings, characters, numbers, collections, dates, times and many others.
+The Kotlin module adds APIs for `IntRange` and `Sequence`.
+To get a feeling for the breadth of available options look at 
+[this section](https://jqwik.net/docs/current/user-guide.html#customized-parameter-generation)
+in jqwik's user guide.
+
+
+### Transforming Individual Arbitraries
+
+Having an existing generator of type `Arbitrary<T>` allows you to do many useful things with it.
+Here's an extract of interface `Arbitrary`:
+
+```java
+public interface Arbitrary<T> {
+  Arbitrary<T> filter(Predicate<T> filterPredicate);
+  <U> Arbitrary<U> map(Function<T, U> mapper);
+  <U> Arbitrary<U> flatMap(Function<T, Arbitrary<U>> mapper);
+  Arbitrary<@NullableType T> injectNull(double nullProbability);
+  ListArbitrary<T> list();
+  SetArbitrary<T> set();
+  StreamArbitrary<T> stream();
+  IteratorArbitrary<T> iterator();
+  <A> ArrayArbitrary<T, A> array(Class<A> arrayClass);
+  Arbitrary<Optional<T>> optional();
+}
+```
+
+#### Filtering
+
+Filtering is about including values that fulfill a predicate.
+For generating only even numbers between 2 and 100000:
+
+```kotlin
+Int.any(2..100000).filter {it % 2 == 0}
+```
+
+#### Mapping
+
+Mapping is about using a generated value to produce another one.
+This allows another approach for even numbers between 2 and 100000:
+
+```kotlin
+Int.any(2..50000).map {it * 2}
+```
+
+You can map to different types. 
+We use that here for creating the HEX value of an integer:
+
+```kotlin
+Int.any(1..Int.MAX_VALUE).map { it.toString(16)}
+```
+
+#### Creating Collections and other Multi-Value Types
+
+It's simple. Just use `list()`, `set()` etc..
+Here's a list of 10 doubles:
+
+```kotlin
+Double.any().list().ofSize(10)
+```
+
+Due to the existence of primitive array types in Java, the creation of arrays requires more ceremony:
+
+```kotlin
+Double.any().array(Array<Double>::class.java).ofSize(10)
+```
+
+In Kotlin we have a bit more flexibility, so here's the version using reified types:
+
+```kotlin
+Double.any().array<Double, Array<Double>>()
+```
+
+You decide which one you prefer.
+
+
+#### Flat Mapping
 
 ## Special Kotlin Support
 
