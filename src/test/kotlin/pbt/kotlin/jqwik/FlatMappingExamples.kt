@@ -1,17 +1,27 @@
 package pbt.kotlin.jqwik
 
-import net.jqwik.api.Arbitrary
-import net.jqwik.api.ForAll
-import net.jqwik.api.Property
-import net.jqwik.api.Provide
+import net.jqwik.api.*
+import net.jqwik.api.constraints.Size
+import net.jqwik.api.constraints.UniqueElements
+import net.jqwik.kotlin.api.JqwikIntRange
 import net.jqwik.kotlin.api.any
 import org.assertj.core.api.Assertions.assertThat
 
 class FlatMappingExamples {
 
-    // This property fails because index does not consider the number of elements in list
+    @Disabled("This property fails because index does not consider the number of elements in list")
     @Property
     fun `index works for element in list`(@ForAll list: List<Int>, @ForAll index: Int) {
+        val element = list[index]
+        assertThat(list.indexOf(element)).isEqualTo(index)
+    }
+
+    @Property
+    fun `index works for element in list - using assumption`(
+        @ForAll @UniqueElements @Size(max = 50) list: List<Int>,
+        @ForAll @JqwikIntRange(max = 49) index: Int
+    ) {
+        Assume.that(index >= 0 && index < list.size)
         val element = list[index]
         assertThat(list.indexOf(element)).isEqualTo(index)
     }

@@ -25,6 +25,7 @@ You can find [all code examples on github](https://github.com/jlink/property-bas
 - [A Short Intro to PBT](#a-short-intro-to-pbt)
 - [Jqwik, JUnit Platform and Kotlin](#jqwik-junit-platform-and-kotlin)
 - [Setting Up Jqwik](#setting-up-jqwik)
+- [Success, Failure and Shrinking](#success-failure-and-shrinking)
 - [Generators (aka Arbitraries)](#generators-aka-arbitraries)
   - [Programming Generators](#programming-generators)
     - [Generate by Type](#generate-by-type)
@@ -35,8 +36,11 @@ You can find [all code examples on github](https://github.com/jlink/property-bas
   - [Transforming Individual Arbitraries](#transforming-individual-arbitraries)
     - [Filtering](#filtering)
     - [Mapping](#mapping)
-    - [Creating Collections and other Multi-Value Types](#creating-collections-and-other-multi-value-types)
-    - [Flat Mapping](#flat-mapping)
+  - [Creating Collections and other Multi-Value Types](#creating-collections-and-other-multi-value-types)
+  - [Flat Mapping](#flat-mapping)
+  - [Assumptions](#assumptions)
+  - [Combining Generators](#combining-generators)
+  - [Providing Generators through Domain Contexts](#providing-generators-through-domain-contexts)
 - [Special Kotlin Support](#special-kotlin-support)
   - [Compatibility](#compatibility)
   - [Nullability](#nullability)
@@ -411,10 +415,13 @@ We use that here for creating the HEX value of an integer:
 Int.any(1..Int.MAX_VALUE).map { it.toString(16)}
 ```
 
-#### Creating Collections and other Multi-Value Types
+### Creating Collections and other Multi-Value Types
 
-It's simple. Just use `list()`, `set()` etc..
-Here's a list of 10 doubles:
+Lists, sets, arrays etc. are very common when it comes to building domain specific data types.
+Therefore, it should be easy to generate those as well; and it is.
+Just use `list()`, `set()`, `stream()`, `iterator()` and `array(..)`:
+
+Here's how you build a generator for lists of 10 doubles:
 
 ```kotlin
 Double.any().list().ofSize(10)
@@ -435,7 +442,7 @@ Double.any().array<Double, Array<Double>>().ofSize(10)
 
 You decide which one you prefer.
 
-#### Flat Mapping
+### Flat Mapping
 
 _Flat Mapping_ is one of the magic words you have to use if you want to belong to the functional crowd.
 The idea behind it is straightforward: 
@@ -516,6 +523,66 @@ fun listWithValidIndex() : Arbitrary<Pair<List<Int>, Int>> {
 }
 ```
 
+Et voilà, everything running fine now.
+
+
+### Assumptions
+
+In a way, flat mapping over arbitraries is a rather involved way to deal with dependencies across.
+A simpler and sometimes more natural way to reach the same goal are assumptions.
+An assumption is a filter that can use all parameters of a property function: 
+
+```kotlin
+@Property
+fun `index works for element in lis`(
+      @ForAll @UniqueElements list: List<Int>, 
+      @ForAll index: Int
+) {
+    Assume.that(index >= 0 && index < list.size)
+    val element = list[index]
+    assertThat(list.indexOf(element)).isEqualTo(index)
+}
+```
+
+Here, the assumption `Assume.that(index >= 0 && index < list.size)` makes sure 
+that only if `index` is in the valid range, the property will proceed to run.
+This filtering out can, however, lead to a lot of test cases that are generated but thrown away afterwards.
+If too many are thrown away, jqwik will complain and fail:
+
+```
+Property [FlatMappingExamples:index works for element in list - using assumption] exhausted after [1000] tries and [930] rejections
+```
+
+We can mitigate that problem by constraining the initial set of generated test cases; for example:
+
+```kotlin
+@Property
+fun `index works for element in list`(
+    @ForAll @UniqueElements @Size(max = 50) list: List<Int>,
+    @ForAll @JqwikIntRange(max = 49) index: Int
+) {
+    //...
+}
+```
+
+This should succeed, but still, the report shows that more than half 
+of the generated test cases are being thrown away:
+
+```
+FlatMappingExamples:index works for element in list = 
+                              |-------------------jqwik-------------------
+tries = 1000                  | # of calls to property
+checks = 463                  | # of not rejected calls
+```
+
+
+### Combining Generators
+
+_tbd_
+
+### Providing Generators through Domain Contexts
+
+_tbd_
 
 ## Special Kotlin Support
 
