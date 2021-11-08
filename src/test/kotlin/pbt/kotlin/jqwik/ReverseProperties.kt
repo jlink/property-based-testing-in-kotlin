@@ -1,5 +1,6 @@
 package pbt.kotlin.jqwik
 
+import net.jqwik.api.Disabled
 import net.jqwik.api.ForAll
 import net.jqwik.api.Property
 import net.jqwik.api.constraints.Size
@@ -10,6 +11,12 @@ class ReverseProperties {
     @Property
     fun `reversing keeps all elements`(@ForAll list: List<Int>) {
         assertThat(list.reversed()).containsAll(list)
+    }
+
+    @Property
+    @Disabled("Expected to fail")
+    fun `reversing keeps the list unchanged`(@ForAll list: List<Int>) {
+        assertThat(list.reversed()).isEqualTo(list)
     }
 
     @Property
