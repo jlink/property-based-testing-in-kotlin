@@ -165,6 +165,10 @@ and
 [jqwik-starter-maven-kotlin](https://github.com/jlink/jqwik-samples/tree/main/jqwik-starter-maven-kotlin)
 for fully configured examples for Gradle and Maven.
 
+## Success, Failure and Shrinking
+
+_tbd_
+
 ## Generators (aka Arbitraries)
 
 _jqwik_ comes with quite a few built-in generators for many of Java's and Kotlin's fundamental types.
@@ -431,8 +435,87 @@ Double.any().array<Double, Array<Double>>().ofSize(10)
 
 You decide which one you prefer.
 
-
 #### Flat Mapping
+
+_Flat Mapping_ is one of the magic words you have to use if you want to belong to the functional crowd.
+The idea behind it is straightforward: 
+Instead of using a (generated) value to produce another value, which is a plain _map_,
+you produce another _arbitrary_ instead.
+
+Why is that useful?
+Now and then you want to generate several arbitrary values; 
+but the values are not fully independent of each other but there's some condition linking the two values.
+Imagine you had to verify that `List<T>.index(t)` returns the correct index for elements that are present in the list.
+Here's a property trying to check that property:
+
+```kotlin
+@Property
+fun `index works for element in list`(@ForAll list: List<Int>, @ForAll index: Int) {
+    val element = list[index]
+    assertThat(list.indexOf(element)).isEqualTo(index)
+}
+```
+
+Maybe you've already expected the failure:
+
+```
+FlatMappingExamples:index works for element in list = 
+  java.lang.IndexOutOfBoundsException:
+    Index 0 out of bounds for length 0
+
+Shrunk Sample (2 steps)
+-----------------------
+  list: []
+  index: 0
+```
+
+The problem at hand: the generated value for _index_ does not consider the number of elements 
+in the generated list; but it should to make the property really a falsifiable one.
+Flat mapping comes to our rescue:
+
+```kotlin
+@Property
+fun `index works for element in list`(@ForAll("listWithValidIndex") listWithIndex: Pair<List<Int>, Int>) {
+    val (list, index) = listWithIndex
+    val element = list[index]
+    assertThat(list.indexOf(element)).isEqualTo(index)
+}
+
+@Provide
+fun listWithValidIndex() : Arbitrary<Pair<List<Int>, Int>> {
+    val lists = Int.any().list().ofMinSize(1)
+    return lists.flatMap { list -> Int.any(0 until list.size).map { index -> Pair(list, index)} }
+}
+```
+
+The magic happens in the line with the `return` statement:
+The size of the generated `list` is used to constrain the upper border of the index generator.
+The final trick is to return the two values, the `list` and the `index`, together as a `Pair`.
+
+As a surprise to me, the property still fails:
+
+```
+FlatMappingExamples:index works for element in list = 
+  org.opentest4j.AssertionFailedError:
+    expected: 1
+     but was: 0
+     
+Shrunk Sample (86 steps)
+------------------------
+  listWithIndex: ([0, 0], 1)
+```
+
+Our property did not consider duplicate elements in the list.
+One way to get rid of that problem is to make sure elements are unique:
+
+```kotlin
+@Provide
+fun listWithValidIndex() : Arbitrary<Pair<List<Int>, Int>> {
+    val lists = Int.any().list().uniqueElements().ofMinSize(1)
+    return lists.flatMap { list -> Int.any(0 until list.size).map { index -> Pair(list, index)} }
+}
+```
+
 
 ## Special Kotlin Support
 
