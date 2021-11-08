@@ -171,6 +171,8 @@ for fully configured examples for Gradle and Maven.
 
 ## Success, Failure and Shrinking
 
+Now that you can run your own properties it's worthwhile to look at jqwik's output and reporting. 
+
 _tbd_
 
 ## Generators (aka Arbitraries)
