@@ -197,13 +197,13 @@ edge-cases#tried = 10         | # of edge cases tried in current run
 seed = -8839434152225186972   | random seed to reproduce generated values
 ```
 
-In its default configuration this report will be published for each and every property.
+With default configuration this report will be published for each and every property.
 It tells you how often a property function has been started (`tries`), 
 how often it has actually been evaluated (`checks`),
 the random `seed` that can be used for replicating the exact same generated test data,
 and other information of lesser interest.
 
-Let's see what happens if a property run fails.
+Let's see what happens if a property fails.
 The following property suggests that `list.reversed()` does nothing:
 
 ```kotlin
@@ -256,7 +256,7 @@ Shrinking has two big advantages:
 - It provides you with a sample that has less complexity and that is therefore easier to reason about.
   In the ideal case, you have now the simplest failing sample, with no accidental complexity.
 - If it works perfectly - which it often does not - it will always shrink to the exact same sample.
-  That means less in-determinism in your tests, which is a major factor for continuous integration.
+  That means less non-determinism in your tests, which is a major factor for continuous integration.
 
 Shrinking is a major differentiator when it comes to comparing PBT libraries with each other.
 Libraries usually follow one of two approaches:
