@@ -679,7 +679,46 @@ checks = 463                  | # of not rejected calls
 
 ### Combining Generators
 
-_tbd_
+We've already seen the most common way to combine two or more arbitraries into a more complicated one.
+The pattern, which scales up to 8 arbitraries, looks as follows:
+
+```kotlin
+val arbitrary1: Arbitrary<T1> = ...
+val arbitrary2: Arbitrary<T2> = ...
+val arbitrary3: Arbitrary<T3> = ...
+
+combine(arbitrary1, arbitrary2, arbitrary3) { t1, t2, t3 ->
+    // return a value that uses t1 through t3 for its own creation
+}
+```
+
+If you need `t1..n` to configure another generator `flatCombine(..)` is what you need.
+
+There is another way to do something similar using a _builder_-based approach.
+_Builders_ collect information required for construction - often in functions starting `with...` -
+and then create the desired result type in a single step, e.g. by calling `build()`.
+Using that approach the `Player` example from above could look as follows:
+
+```kotlin
+@Provide
+fun players() : Arbitrary<Player> {
+    val builder = Builders.withBuilder { PlayerBuilder() }
+    return builder
+        .use(nicknames()).`in` {b, n -> b.withNickname(n)}
+        .use(rankings()).`in` {b, r -> b.withRanking(r)}
+        .use(positions()).`in` {b, p -> b.withPosition(p)}
+        .build { it.build()}
+}
+```
+
+Using `Builders.withBuilder(..)` makes sense if:
+- You already have builder classes for your domain type
+- You have more than 8 attributes to combine
+- You consider the builder syntax more readable
+
+In the end `combine(..)` and builders are equivalent; 
+sometimes one tends to be more concise (read: less code) than the other.
+
 
 ### Providing Generators through Domain Contexts
 
