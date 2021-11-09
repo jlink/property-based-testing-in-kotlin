@@ -37,6 +37,9 @@ using [jqwik's](https://jqwik.net) [Kotlin module](https://jqwik.net/docs/snapsh
   - [Assumptions](#assumptions)
   - [Combining Generators](#combining-generators)
   - [Providing Generators through Domain Contexts](#providing-generators-through-domain-contexts)
+    - [The Poker Domain](#the-poker-domain)
+    - [Advanced Usage of Domains](#advanced-usage-of-domains)
+  - [Registering Generators for Global Use](#registering-generators-for-global-use)
 - [Special Kotlin Support](#special-kotlin-support)
   - [Compatibility](#compatibility)
   - [Nullability](#nullability)
@@ -44,6 +47,9 @@ using [jqwik's](https://jqwik.net) [Kotlin module](https://jqwik.net/docs/snapsh
   - [Testing of Asynchronous Code](#testing-of-asynchronous-code)
   - [Constraints and Quirks](#constraints-and-quirks)
 - [Alternatives to jqwik](#alternatives-to-jqwik)
+- [Summary](#summary)
+  - [Feedback](#feedback)
+  - [Sharing, Code and License](#sharing-code-and-license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -977,12 +983,8 @@ this might be an open Kotlin bug.
 
 ## Summary
 
-Property-based testing of stateful systems can get a bit more involved than
-using PBT for plain functions and systems without relevant state.
-Sometimes it's easy to use post-conditions for the various actions that
-can be applied. In other cases it's much easier to write an explicit model that
-duplicates some aspects of the implementation under tests and can thereby
-serve as an easy-to-use oracle for an action's outcome.
+Property-based testing is a cool tool to enhance and partially replace example-based testing.
+jqwik, which originally is a Java library, now comes with a Kotlin module to make its usage with Kotlin smoother.
 
 ### Feedback
 
