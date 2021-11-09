@@ -820,6 +820,26 @@ class PokerProperties {
 These three properties just verify that the generators work as expected.
 Now you have the tools to start implementing and testing the actual Poker engine!
 
+#### Advanced Usage of Domains
+
+There's one caveat you should be aware of: 
+As soon as you use apply a domain to your property or property class, 
+all the built-in generators for Strings, numbers etc. are no longer available by default.
+To enable them you have to additionally add `@Domain(DomainContext.Global::class)`.
+Since Kotlin does not support repeatable annotations (yet),
+add more than one annotation looks a bit cumbersome:
+
+```kotlin
+@DomainList(
+    Domain(PokerDomain::class),
+    Domain(DomainContext.Global::class)
+)
+```
+
+Provider functions are just the simplest way of adding generators to a domain.
+A domain can also have full-fledged arbitrary providers and arbitrary configurators.
+Look at [Domain and Domain Contexts](https://jqwik.net/docs/current/user-guide.html#domain-and-domain-context)
+in jqwik's user-guide for the full functionality available.
 
 ## Special Kotlin Support
 

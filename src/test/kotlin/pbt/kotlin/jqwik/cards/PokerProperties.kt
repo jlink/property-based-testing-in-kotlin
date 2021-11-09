@@ -3,12 +3,17 @@ package pbt.kotlin.jqwik.cards
 import net.jqwik.api.ForAll
 import net.jqwik.api.Property
 import net.jqwik.api.domains.Domain
+import net.jqwik.api.domains.DomainContext
+import net.jqwik.api.domains.DomainList
 import net.jqwik.api.lifecycle.PerProperty
 import net.jqwik.api.lifecycle.PropertyExecutionResult
 import net.jqwik.api.statistics.Statistics
 import org.assertj.core.api.Assertions.assertThat
 
-@Domain(PokerDomain::class)
+@DomainList(
+    Domain(PokerDomain::class),
+    Domain(DomainContext.Global::class)
+)
 class PokerProperties {
 
     @Property
