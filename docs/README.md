@@ -761,8 +761,8 @@ All these generators can be placed as functions to a domain context class:
 class PokerDomain : DomainContextBase() {
   @Provide
   fun cards(): Arbitrary<PlayingCard> {
-    val suit = Arbitraries.of(Suit::class.java)
-    val rank = Arbitraries.of(Rank::class.java).filter { r: Rank -> r !== Rank.JOKER }
+    val suit = Enum.any<Suit>()
+    val rank = Enum.any<Rank>().filter { r: Rank -> r !== Rank.JOKER }
     return combine(suit, rank) { s: Suit, r: Rank -> PlayingCard(s, r) }.withoutEdgeCases()
   }
 
