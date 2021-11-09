@@ -890,10 +890,10 @@ _jqwik_ is compatible with Kotlin's syntax and its somewhat different view on Ja
 That means that:
 
 - You can use functions instead of methods; functions returning `false` indicate a failure.
-- 
+
 - Kotlin allows function names - and even class names! - with spaces and a few other special characters;
   you have to use backticks for those names, though.
-- 
+
 - You can use Kotlin's expression syntax for property functions, 
   which allows for very concise statements:
   
@@ -903,7 +903,7 @@ That means that:
   ```
 
 - You can use all of Kotlin's array and collection types (and have them generated for you).
-- 
+
 - You can use Kotlin function types instead of Java's lambdas and `@Functional` types.
   Thus, the following property works without the need for further configuration:
 
