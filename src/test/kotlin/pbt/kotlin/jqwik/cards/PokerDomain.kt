@@ -1,15 +1,10 @@
 package pbt.kotlin.jqwik.cards
 
-import net.jqwik.api.Arbitraries
 import net.jqwik.api.Arbitrary
 import net.jqwik.api.Provide
 import net.jqwik.api.domains.DomainContextBase
+import net.jqwik.kotlin.api.any
 import net.jqwik.kotlin.api.combine
-
-// TODO: Move to kotlin module
-inline fun <reified T:Enum<T>> Enum.Companion.any(): Arbitrary<T> {
-    return Arbitraries.of(T::class.java)
-}
 
 class PokerDomain : DomainContextBase() {
     @Provide

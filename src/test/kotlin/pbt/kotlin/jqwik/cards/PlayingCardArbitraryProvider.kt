@@ -3,6 +3,7 @@ package pbt.kotlin.jqwik.cards
 import net.jqwik.api.Arbitrary
 import net.jqwik.api.providers.ArbitraryProvider
 import net.jqwik.api.providers.TypeUsage
+import net.jqwik.kotlin.api.any
 import net.jqwik.kotlin.api.combine
 
 class PlayingCardArbitraryProvider : ArbitraryProvider {
