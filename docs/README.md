@@ -13,10 +13,6 @@ Some of the few articles and resources I found are
 To fill the gap a bit this article covers the application of PBT in Kotlin 
 using [jqwik's](https://jqwik.net) [Kotlin module](https://jqwik.net/docs/snapshot/user-guide.html#kotlin-module).
 
-### The Code
-
-You can find [all code examples on github](https://github.com/jlink/property-based-testing-in-kotlin/tree/master/src).
-
 <!-- Generated toc must be stripped of `nbsp` occurrences in links -->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -825,3 +821,27 @@ If you notice that a constraint annotation is sometimes not honoured by the gene
 this might be an open Kotlin bug.
 
 ## Alternatives to jqwik
+
+
+## Summary
+
+Property-based testing of stateful systems can get a bit more involved than
+using PBT for plain functions and systems without relevant state.
+Sometimes it's easy to use post-conditions for the various actions that
+can be applied. In other cases it's much easier to write an explicit model that
+duplicates some aspects of the implementation under tests and can thereby
+serve as an easy-to-use oracle for an action's outcome.
+
+### Feedback
+
+Give feedback, ask questions and tell me about your own PBT experiences
+on [Twitter](https://twitter.com/johanneslink).
+
+
+### Sharing, Code and License
+
+This article is published under the following license:
+[Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/)
+
+You can find 
+[all code examples on github](https://github.com/jlink/property-based-testing-in-kotlin/tree/master/src).
