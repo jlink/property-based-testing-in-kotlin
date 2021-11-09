@@ -789,7 +789,11 @@ class PokerDomain : DomainContextBase() {
 
 In addition to the `@Provide` annotation, the return type of the provider function plays an important role:
 The variable part inside `Arbitrary<..>` is used to match the type of a property function's for-all-parameter.
-With that in place, the property functions can just use the target type of values to be generated:
+Provider functions in domains supersede standard rules.
+That means that `fun decks(): Arbitrary<List<PlayingCard>>` will be used for all lists of `PlayingCard`s;
+constraining annotations like `@Size` do not work on them.
+
+With `PokerDomain` in place property functions can simply use the type of values they want to be generated:
 
 ```kotlin
 @Domain(PokerDomain::class)
@@ -817,14 +821,14 @@ class PokerProperties {
 }
 ```
 
-These three properties just verify that the generators work as expected.
+These three properties verify that the generators work as expected.
 Now you have the tools to start implementing and testing the actual Poker engine!
 
 #### Advanced Usage of Domains
 
 There's one caveat you should be aware of: 
-As soon as you use apply a domain to your property or property class, 
-all the built-in generators for Strings, numbers etc. are no longer available by default.
+As soon as you apply a domain to your property or property class, 
+all built-in generators for Strings, numbers etc. are no longer available by default.
 To enable them you have to additionally add `@Domain(DomainContext.Global::class)`.
 Since Kotlin does not support repeatable annotations (yet),
 add more than one annotation looks a bit cumbersome:
@@ -840,6 +844,33 @@ Provider functions are just the simplest way of adding generators to a domain.
 A domain can also have full-fledged arbitrary providers and arbitrary configurators.
 Look at [Domain and Domain Contexts](https://jqwik.net/docs/current/user-guide.html#domain-and-domain-context)
 in jqwik's user-guide for the full functionality available.
+
+
+### Registering Generators for Global Use
+
+Last but not least, there is one more way to provide an arbitrary for a given type:
+Registering a global `ArbitraryProvider` implementation.
+If you'd like, for example, to generate a `PlayingCard` whenever this type is referenced in a for-all parameter,
+All you program is this class:
+
+```kotlin
+class PlayingCardArbitraryProvider : ArbitraryProvider {
+    override fun canProvideFor(targetType: TypeUsage) = targetType.isOfType(PlayingCard::class.java)
+
+    override fun provideFor(
+        targetType: TypeUsage,
+        subtypeProvider: ArbitraryProvider.SubtypeProvider
+    ): Set<Arbitrary<out Any>> {
+        val suit = Enum.any<Suit>()
+        val rank = Enum.any<Rank>().filter { r: Rank -> r !== Rank.JOKER }
+        return setOf(combine(suit, rank, ::PlayingCard).withoutEdgeCases())
+    }
+}
+```
+
+and [register it as a service provider](https://jqwik.net/docs/current/user-guide.html#providing-default-arbitraries)
+in `META-INF/services/net.jqwik.api.providers.ArbitraryProvider`.
+
 
 ## Special Kotlin Support
 

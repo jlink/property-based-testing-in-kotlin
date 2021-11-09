@@ -6,11 +6,16 @@ import net.jqwik.api.Provide
 import net.jqwik.api.domains.DomainContextBase
 import net.jqwik.kotlin.api.combine
 
+// TODO: Move to kotlin module
+inline fun <reified T:Enum<T>> Enum.Companion.any(): Arbitrary<T> {
+    return Arbitraries.of(T::class.java)
+}
+
 class PokerDomain : DomainContextBase() {
     @Provide
     fun cards(): Arbitrary<PlayingCard> {
-        val suit = Arbitraries.of(Suit::class.java)
-        val rank = Arbitraries.of(Rank::class.java).filter { r: Rank -> r !== Rank.JOKER }
+        val suit = Enum.any<Suit>()
+        val rank = Enum.any<Rank>().filter { r: Rank -> r !== Rank.JOKER }
         return combine(suit, rank) { s: Suit, r: Rank -> PlayingCard(s, r) }.withoutEdgeCases()
     }
 

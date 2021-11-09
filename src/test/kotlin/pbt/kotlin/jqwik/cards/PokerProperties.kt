@@ -12,7 +12,7 @@ import org.assertj.core.api.Assertions.assertThat
 
 @DomainList(
     Domain(PokerDomain::class),
-    Domain(DomainContext.Global::class)
+    // Domain(DomainContext.Global::class)
 )
 class PokerProperties {
 
