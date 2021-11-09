@@ -3,6 +3,8 @@ package pbt.kotlin.jqwik.cards
 import net.jqwik.api.ForAll
 import net.jqwik.api.Property
 import net.jqwik.api.domains.Domain
+import net.jqwik.api.lifecycle.PerProperty
+import net.jqwik.api.lifecycle.PropertyExecutionResult
 import net.jqwik.api.statistics.Statistics
 import org.assertj.core.api.Assertions.assertThat
 
@@ -10,12 +12,19 @@ import org.assertj.core.api.Assertions.assertThat
 class PokerProperties {
 
     @Property
-    fun all52PossibleCardsAreGenerated(@ForAll card: PlayingCard) {
+    @PerProperty(All52Cards::class)
+    fun `all 52 possible cards are generated`(@ForAll card: PlayingCard) {
         println(card)
     }
 
+    class All52Cards : PerProperty.Lifecycle {
+        override fun after(result: PropertyExecutionResult) {
+            assertThat(result.countTries()).isEqualTo(52)
+        }
+    }
+
     @Property
-    fun shuffledDecksAreGenerated(@ForAll deck: List<PlayingCard>) {
+    fun `shuffled decks are generated`(@ForAll deck: List<PlayingCard>) {
         // System.out.println(deck)
         Statistics.collect(deck[0]) // Collect statistics for first card in deck
         assertThat(deck).hasSize(52)
@@ -23,14 +32,14 @@ class PokerProperties {
     }
 
     @Property
-    fun aHandHas5UniqueCards(@ForAll hand: Hand) {
+    fun `a hand has 5 unique cards`(@ForAll hand: Hand) {
         // System.out.println(hand)
         assertThat(hand.show()).hasSize(5)
         assertThat(HashSet(hand.show())).hasSize(5)
     }
 
     @Property
-    fun twoHandsDontShareCards(@ForAll twoHands: Pair<Hand, Hand>) {
+    fun `two hands dont share cards`(@ForAll twoHands: Pair<Hand, Hand>) {
         val first = twoHands.first
         val second = twoHands.second
         assertThat(first.show()).hasSize(5)
@@ -39,3 +48,4 @@ class PokerProperties {
     }
 
 }
+

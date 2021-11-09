@@ -718,7 +718,108 @@ sometimes one tends to be more concise (read: less code) than the other.
 
 ### Providing Generators through Domain Contexts
 
-_tbd_
+In most examples I showed so far, generators / arbitraries were handed in through provider functions.
+This is convenient, since it allows to have the specification of generated data 
+close to the property function itself.
+One thing with this approach is difficult, though: 
+Sharing generators across container classes is not easily possible.
+You _could_ move common generation logic into a helper class and then delegate to it from provider functions,
+which _must_ reside in the class of the property function, or in a supertype, 
+or in the case of nested inner classes in one of its containing classes.
+
+Enter jqwik's concept of _domains_. 
+A "domain" is a collection of arbitrary providers and configurators that belong together.
+In concrete programming terms:
+- It's a class that has to implement `net.jqwik.api.domains.DomainContext` or, in most cases,
+  that extends `net.jqwik.api.domains.DomainContextBase`.
+- Such a domain context implementation is considered for property functions,
+  if the function or its container class has the annotation `@Domain(MyDomainContext::class)`.
+
+When a domain context class extends `DomainContextBase` the simplest way to provide a generator
+is by moving the provider function from your properties class to the context class, 
+the `@Provide` annotation included.
+
+#### The Poker Domain
+
+To demonstrate this, I've chosen Poker, the card game, as an example.
+It comes with four domain types:
+- enum class `Suit`: SPADES, HEARTS, DIAMONDS, CLUBS
+- enum class `Rank`: JOKER, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
+- data class `PlayingCard(val suit: Suit, val rank: Rank)`
+- data class `Hand(val cards: List<PlayingCard>)`
+
+What we'll need to generate for testing a Poker engine or a Poker AI are:
+- Individual playing cards
+- A full deck of 52 cards, shuffled
+- Valid Hands with no duplicate cards
+- Two or more hands out of a deck
+- etc.
+
+All these generators can be placed as functions to a domain context class:
+
+```kotlin
+class PokerDomain : DomainContextBase() {
+  @Provide
+  fun cards(): Arbitrary<PlayingCard> {
+    val suit = Arbitraries.of(Suit::class.java)
+    val rank = Arbitraries.of(Rank::class.java).filter { r: Rank -> r !== Rank.JOKER }
+    return combine(suit, rank) { s: Suit, r: Rank -> PlayingCard(s, r) }.withoutEdgeCases()
+  }
+
+  @Provide
+  fun decks(): Arbitrary<List<PlayingCard>> {
+    return cards().list().uniqueElements().ofSize(52)
+  }
+
+  @Provide
+  fun hands(): Arbitrary<Hand> {
+    return decks().map { deck: List<PlayingCard> -> Hand(deck.subList(0, 5)) }
+  }
+
+  @Provide
+  fun pairOfHands(): Arbitrary<Pair<Hand, Hand>> {
+    return decks().map { deck: List<PlayingCard> ->
+      val first = Hand(deck.subList(0, 5))
+      val second = Hand(deck.subList(5, 10))
+      Pair(first, second)
+    }
+  }
+}
+```
+
+In addition to the `@Provide` annotation, the return type of the provider function plays an important role:
+The variable part inside `Arbitrary<..>` is used to match the type of a property function's for-all-parameter.
+With that in place, the property functions can just use the target type of values to be generated:
+
+```kotlin
+@Domain(PokerDomain::class)
+class PokerProperties {
+    @Property
+    fun `shuffled decks are generated`(@ForAll deck: List<PlayingCard>) {
+        assertThat(deck).hasSize(52)
+        assertThat(HashSet(deck)).hasSize(52)
+    }
+
+    @Property
+    fun `a hand has 5 unique cards`(@ForAll hand: Hand) {
+        assertThat(hand.show()).hasSize(5)
+        assertThat(HashSet(hand.show())).hasSize(5)
+    }
+
+    @Property
+    fun `two hands dont share cards`(@ForAll twoHands: Pair<Hand, Hand>) {
+        val first = twoHands.first
+        val second = twoHands.second
+        assertThat(first.show()).hasSize(5)
+        assertThat(second.show()).hasSize(5)
+        assertThat(first.show()).doesNotContainAnyElementsOf(second.show())
+    }
+}
+```
+
+These three properties just verify that the generators work as expected.
+Now you have the tools to start implementing and testing the actual Poker engine!
+
 
 ## Special Kotlin Support
 

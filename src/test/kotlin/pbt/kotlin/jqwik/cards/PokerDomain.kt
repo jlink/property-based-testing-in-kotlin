@@ -32,5 +32,4 @@ class PokerDomain : DomainContextBase() {
             Pair(first, second)
         }
     }
-
 }
