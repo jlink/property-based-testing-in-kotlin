@@ -1111,6 +1111,48 @@ you are invited to [create an issue](https://github.com/jlink/jqwik/issues/new?t
 
 ### Testing of Asynchronous Code
 
+Another strong side of Kotlin is its support for 
+[asynchronous, non-blocking code and co-routines](https://kotlinlang.org/docs/coroutines-overview.html).
+In order to test suspending functions or coroutines the Kotlin module offers two options:
+
+- Use the global function `runBlockingProperty(..)`.
+
+- Just add the `suspend` modifier to the property method.
+
+```kotlin
+suspend fun echo(string: String): String {
+  delay(100)
+  return string
+}
+
+@Property
+fun `use runBlockingProperty`(@ForAll s: String) =
+  runBlockingProperty {
+    assertThat(echo(s)).isEqualTo(s)
+  }
+
+@Property
+fun `use runBlockingProperty with context`(@ForAll s: String) =
+  runBlockingProperty(EmptyCoroutineContext) {
+    assertThat(echo(s)).isEqualTo(s)
+  }
+
+@Property
+suspend fun `use suspend function`(@ForAll s: String) {
+  assertThat(echo(s)).isEqualTo(s)
+}
+```
+
+Both variants just start the body of the property method asynchronously and wait for all coroutines to finish.
+That means that delays will require the full amount of specified delay time and context switching,
+which may push you towards a smaller number of tries if a property's execution time gets too high.
+
+If you need more control over [dispatchers](https://kotlinlang.org/docs/coroutine-context-and-dispatchers.html) 
+or the handling of delays, you should consider using
+[`kotlinx.coroutines` testing support](https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-test).
+This will require to add a dependency on `org.jetbrains.kotlinx:kotlinx-coroutines-test`.
+
+
 ### Constraints and Quirks
 
 Some things are not as smooth (yet) as I'd like them to be.
