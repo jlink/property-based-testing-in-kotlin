@@ -40,7 +40,8 @@ using [jqwik's](https://jqwik.net) [Kotlin module](https://jqwik.net/docs/snapsh
     - [The Poker Domain](#the-poker-domain)
     - [Advanced Usage of Domains](#advanced-usage-of-domains)
   - [Registering Generators for Global Use](#registering-generators-for-global-use)
-- [Special Kotlin Support](#special-kotlin-support)
+- [Finding Good and Useful Properties](#finding-good-and-useful-properties)
+- [jqwik's Kotlin Support](#jqwiks-kotlin-support)
   - [Compatibility](#compatibility)
   - [Nullability](#nullability)
   - [Convenience Methods](#convenience-methods)
@@ -877,10 +878,33 @@ class PlayingCardArbitraryProvider : ArbitraryProvider {
 and [register it as a service provider](https://jqwik.net/docs/current/user-guide.html#providing-default-arbitraries)
 in `META-INF/services/net.jqwik.api.providers.ArbitraryProvider`.
 
+## Finding Good and Useful Properties
 
-## Special Kotlin Support
+The mechanics of writing and running properties is one side of the coin.
+The other side, and arguably the more important one, is to find good properties 
+and to integrate Property-based testing into your development process.
 
-The kotlin module has two main goals: 
+It's beyond the scope of this article to cover enough of this ground to make it worthwhile.
+That's why I'll provide you with a few pointers to earlier articles:
+
+- [Patterns to Find Properties](https://blog.johanneslink.net/2018/07/16/patterns-to-find-properties/)
+- [Stateful Testing](https://blog.johanneslink.net/2018/09/06/stateful-testing/)
+- [How to Specify It! In Java](https://johanneslink.net/how-to-specify-it/)
+- [Model-based Testing](https://blog.johanneslink.net/2020/03/11/model-based-testing/)
+- [Property-driven Development](https://blog.johanneslink.net/2019/05/11/property-based-driven-development/)
+
+Most examples in those articles use Java.
+I trust you to make the translation to Kotlin without much hassle.
+
+
+## jqwik's Kotlin Support
+
+Most of the code examples we've seen so far, work with plain jqwik.
+If they don't, it's usually due to a Kotlin convenience method like `String.any()`, 
+which would translate to `Arbitraries.strings()` in jqwik's Java-based API.
+
+Idiomatic Kotlin, however, is more than just converting Java code into Kotlin syntax. 
+That's why - starting with version 1.6.0 - jqwik provides an optional Kotlin module with two main goals:
 Smoothing off some rough edges when using the jqwik API in Kotlin 
 and supporting (some of) the additional features that Kotlin brings to the table.
 
