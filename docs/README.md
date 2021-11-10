@@ -1,5 +1,7 @@
 # Property-based Testing in Kotlin
 
+##### _This is work in progress. Please provide feedback on [Twitter](https://twitter.com/johanneslink)_
+
 Kotlin is currently the most hyped language on the JVM. With good reason.
 Kotlin is mostly compatible with Java and comes with a nice set of features 
 to make programming on the JVM less burdensome and more functional.
