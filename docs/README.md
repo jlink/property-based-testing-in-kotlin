@@ -850,7 +850,7 @@ add more than one annotation looks a bit cumbersome:
 Provider functions are just the simplest way of adding generators to a domain.
 A domain can also have full-fledged arbitrary providers and arbitrary configurators.
 Look at [Domain and Domain Contexts](https://jqwik.net/docs/current/user-guide.html#domain-and-domain-context)
-in jqwik's user-guide for the full functionality available.
+in jqwik's user guide for the full functionality available.
 
 
 ### Registering Generators for Global Use
@@ -1014,6 +1014,47 @@ fun `generate nulls in list`(@ForAll list: List<@WithNull String?>) {
 ```
 
 ### Convenience Methods
+
+Using the Java API can be quite involved from Kotlin.
+That's why `jqwik-kotlin` comes with quite a few convenience functions.
+Here's a selection:
+
+- Instead of `Arbitraries.strings()`, `Arbitraries.integers()` etc. you can use
+  a shorthand `String.any()`, `Int.any()` and so on.
+
+- `Arbitrary.orNull(probability: Double) : T?` can replace `Arbitrary.injectNull(probabilit)`
+  and returns a nullable type.
+
+- `Arbitrary.array<T, A>()` can replace `Arbitrary.array(javaClass: Class<A>)`.
+
+- In addition to `ofMinSize(..)` and `ofMaxSize(..)` all sizable 
+  arbitraries can now be configured using `ofSize(min..max)`.
+
+- In addition to `ofMinLength(..)` and `ofMaxLength(..)` a `StringArbitrary`
+  can now be configured using `ofLength(min..max)`.
+
+- Getting a type-based generator using the Java API looks a bit awkward in Kotlin:
+  `Arbitraries.forType(MyType::class.java)`.
+  There's a more Kotlinish way to do the same: `anyForType<MyType>()`.
+
+- Similarly, generating enum values looks better like `Enum.any<EnumType> : Arbitrary<EnumType>` 
+  than like `Arbitraries.of(EnumType::class.java)`.
+
+- Combine comes as a top-level function now, e.g.:
+  `combine(String.any(), Int.any(1..10)) { s, i -> s.repeat(i) }`
+
+- `Builders.BuilderCombinator.use(arbitrary, combinator)` to simplify Java API call
+  ```kotlin
+  Builders.BuilderCombinator.use(arbitrary).`in`(combinator) 
+  ```
+  which requires backticks because `in` is a Kotlin keyword.
+
+You can find a comprehensive documentation of convenience functions in  
+[this section](https://jqwik.net/docs/snapshot/user-guide.html#convenience-functions-for-kotlin)
+of jqwik's user guide.
+
+
+### Support for Kotlin SDK
 
 ### Testing of Asynchronous Code
 
