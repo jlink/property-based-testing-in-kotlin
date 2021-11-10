@@ -1,5 +1,7 @@
 # Property-based Testing in Kotlin
 
+#### Last Update: November 10, 2021
+
 ##### _This is work in progress. Please provide feedback on [Twitter](https://twitter.com/johanneslink)_
 
 Kotlin is currently the most hyped language on the JVM. With good reason.
@@ -1170,11 +1172,59 @@ this might be an open Kotlin bug.
 
 ## Kotest - An Alternative to jqwik
 
+jqwik's Kotlin support has one big disadvantage: It's not fully multi-platform.
+Since jqwik makes heavy use of Java's reflection mechanisms, it's bound to the JVM and Android platforms.
+Thus it's worthwhile to have a short look at a really platform-independent contender: 
+[Kotest](https://kotest.io/docs/proptest/property-based-testing.html) 
+
+Unlike jqwik (or JUnit) Kotest does not use annotations to mark test and property functions.
+Instead, it uses _test styles_, which are functionally equivalent, 
+each represented by a class that must be extended. 
+I will use `StringSpec` as my style of choice here.
+
+Let's look at the properties for `List.reversed()`, 
+the jqwik implementation of which we have seen [above](#a-short-intro-to-pbt):
+
+```kotlin
+class KotestExamples : StringSpec({
+    "reversing keeps all elements" {
+        checkAll<List<Int>> { list ->
+            assertThat(list.reversed()).containsAll(list)
+        }
+    }
+
+    "reversing twice results in original list" {
+        checkAll<List<Int>> { list ->
+            assertThat(list.reversed().reversed()).isEqualTo(list)
+        }
+    }
+
+    "reversing swaps first and last" {
+        checkAll(Arb.list(Arb.int(), 1..100)) { list ->
+            val reversed = list.reversed()
+            assertThat(reversed[0]).isEqualTo(list[list.size - 1])
+            assertThat(reversed[list.size - 1]).isEqualTo(list[0])
+        }
+    }
+})
+```
+
+What we can see is that Kotest container classes have there test specifications in the constructor.
+Moreover, there is the possibility to define generators by target type 
+or by choosing them through functions on class `io.kotest.property.Arb`.
+
+As of today (November 2021) Kotest's PBT feature set is much smaller than jqwik's.
+Moreover, given the fundamental different approach of style-based super classes,
+running individual tests and test classes in your IDE is not as straightforward as with jqwik.
+
+Kotest can be a good choice for starting with PBT when you're using it already,
+or when you need a truly multi-platform library.
 
 ## Summary
 
 Property-based testing is a cool tool to enhance and partially replace example-based testing.
-jqwik, which originally is a Java library, now comes with a Kotlin module to make its usage with Kotlin smoother.
+jqwik, which originally is a Java library, now comes with a Kotlin module 
+to make its use with Kotlin smooth and comfortable.
 
 ### Feedback
 
