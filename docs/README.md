@@ -52,7 +52,7 @@ using [jqwik's](https://jqwik.net) [Kotlin module](https://jqwik.net/docs/snapsh
       - [`Triple<A, B, C>`](#triplea-b-c)
   - [Testing of Asynchronous Code](#testing-of-asynchronous-code)
   - [Constraints and Quirks](#constraints-and-quirks)
-- [Alternatives to jqwik](#alternatives-to-jqwik)
+- [Kotest - An Alternative to jqwik](#kotest---an-alternative-to-jqwik)
 - [Summary](#summary)
   - [Feedback](#feedback)
   - [Sharing, Code and License](#sharing-code-and-license)
@@ -1166,7 +1166,7 @@ Kotlin's support for injecting the correct annotations in the byte code is not p
 If you notice that a constraint annotation is sometimes not honoured by the generator,
 this might be an open Kotlin bug.
 
-## Alternatives to jqwik
+## Kotest - An Alternative to jqwik
 
 
 ## Summary
