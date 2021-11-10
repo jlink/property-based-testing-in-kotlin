@@ -1056,6 +1056,54 @@ of jqwik's user guide.
 
 ### Support for Kotlin SDK
 
+The Kotlin standard library comes with a lot of types that don't have an equivalent in the JDK.
+Some of them are already supported directly:
+
+##### `IntRange`
+
+- Create an `IntRangeArbitrary` through `IntRange.any()` or `IntRange.any(range)`
+
+- Using `IntRange` as type in a for-all-parameter will auto-generate it.
+  You can use annotations `@JqwikIntRange` and `@Size` in order to
+  constrain the possible ranges.
+
+##### `Sequence<T>`
+
+- Create a `SequenceArbitrary` by using `.sequence()` on any other arbitrary,
+  which will be used to generate the elements for the sequence.
+  `SequenceArbitrary` offers similar configurability as most other multi-value arbitraries in jqwik.
+
+- Using `Sequence` as type in a for-all-parameter will auto-generate it.
+  You can use annotations @Size` in order to
+  constrain number of values produced by the sequence.
+
+Mind that jqwik will _never create infinite sequences_.
+
+##### `Pair<A, B>`
+
+- Create an instance of `Arbitrary<Pair<A, B>>` by using the global function
+  `anyPair(a: Arbitrary<A>, b: Arbitrary<B>)`.
+
+- Create an instance of `Arbitrary<Pair<T, T>>` by calling `arbitraryForT.pair()`.
+
+- Using `Pair` as type in a for-all-parameter will auto-generate,
+  thereby using the type parameters with their annotations to create the
+  component arbitraries.
+
+##### `Triple<A, B, C>`
+
+- Create an instance of `Arbitrary<Triple<A, B, C>>` by using the global function
+  `anyTriple(a: Arbitrary<A>, b: Arbitrary<B>, c: Arbitrary<C>)`.
+
+- Create an instance of `Arbitrary<Triple<T, T, T>>` by calling `arbitraryForT.triple()`.
+
+- Using `Triple` as type in a for-all-parameter will auto-generate,
+  thereby using the type parameters with their annotations to create the
+  component arbitraries.
+
+If you are missing support for your favourite Kotlin class,
+you are invited to [create an issue](https://github.com/jlink/jqwik/issues/new).
+
 ### Testing of Asynchronous Code
 
 ### Constraints and Quirks
