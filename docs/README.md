@@ -985,6 +985,34 @@ That means that:
 
 ### Nullability
 
+Kotlin's default to not allow `null` values for plain types is one of its strong arguments.
+This goes well together with jqwik's strategy to never generate `null` unless explicitly told to do so.
+Wouldn't it be nice if jqwik used Kotlin's nullability information, e.g. `String?`, 
+to inject `null`s into generated values if and only if the type specifies it?
+
+__The good news:__ Top-level nullable Kotlin types are recognized, 
+i.e., `null`'s will automatically be generated with a probability of 5% in this example:
+
+```kotlin
+@Property
+fun `also generate nulls`(@ForAll nullOrString: String?) {
+    println(nullOrString)
+}
+```
+
+If you want a different probability you have to use `@WithNull(probability)`.
+
+__The bad news:__ The detection of nullable types only works for top-level types.
+Using `@ForAll list: List<String?>` will __not__ result in `null` values within the list.
+Nullability for type parameters must be explicitly set through `@WithNull`:
+
+```kotlin
+@Property(tries = 100)
+fun `generate nulls in list`(@ForAll list: List<@WithNull String?>) {
+    println(list)
+}
+```
+
 ### Convenience Methods
 
 ### Testing of Asynchronous Code
