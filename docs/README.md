@@ -1107,7 +1107,7 @@ Mind that jqwik will _never create infinite sequences_.
   component arbitraries.
 
 If you are missing support for your favourite Kotlin class,
-you are invited to [create an issue](https://github.com/jlink/jqwik/issues/new).
+you are invited to [create an issue](https://github.com/jlink/jqwik/issues/new?title=Kotlin+SDK+Support:).
 
 ### Testing of Asynchronous Code
 
