@@ -981,20 +981,21 @@ and `DomainContextBase`.
 ### Registering Generators for Global Use
 
 Last but not least, there is one more way to provide an arbitrary for a given type:
-Registering a global `ArbitraryProvider` implementation.
-If you'd like, for example, to generate a `PlayingCard` whenever this type is referenced in a for-all parameter,
-All you program is this class:
+You can register a global `ArbitraryProvider` implementation.
+If you would like, for example, to generate a `PlayingCard` whenever this type is referenced 
+in any a for-all parameter, in any property function in your tests, 
+all you need is this class:
 
 ```kotlin
 class PlayingCardArbitraryProvider : ArbitraryProvider {
-    override fun canProvideFor(targetType: TypeUsage) = targetType.isOfType(PlayingCard::class.java)
+    override fun canProvideFor(targetType: TypeUsage) = targetType.isAssignableFrom(PlayingCard::class)
 
     override fun provideFor(
         targetType: TypeUsage,
         subtypeProvider: ArbitraryProvider.SubtypeProvider
     ): Set<Arbitrary<out Any>> {
         val suit = Enum.any<Suit>()
-        val rank = Enum.any<Rank>().filter { r: Rank -> r !== Rank.JOKER }
+        val rank = Enum.any<Rank>()
         return setOf(combine(suit, rank, ::PlayingCard).withoutEdgeCases())
     }
 }
