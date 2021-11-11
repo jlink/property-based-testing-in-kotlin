@@ -470,9 +470,11 @@ There's much more, though, that can be done with arbitraries.
 
 #### Configuration through Fluent API
 
-When you provide generators programmatically, though, annotations are of no help.
-That's why most built-in arbitrary types come with a fluent configuration API.
-Let's take String generation as an example:
+Most built-in arbitrary types come with a fluent configuration API.
+Let's take String generation as an example.
+Calling `Arbitraries.strings()` - or the convenience equivalent `String.any()` - 
+returns an instance of `StringArbitrary`,
+which offers many useful functions to influence its generating behaviour:
 
 ```java
 public interface StringArbitrary extends Arbitrary<String> {
@@ -489,7 +491,7 @@ public interface StringArbitrary extends Arbitrary<String> {
 	StringArbitrary all();
 	StringArbitrary excludeChars(char ... charsToExclude);
 	StringArbitrary withLengthDistribution(RandomDistribution lengthDistribution);
-	Arbitrary<String> repeatChars(double repeatProbability);
+    StringArbitrary repeatChars(double repeatProbability);
 }
 ```
 
@@ -506,7 +508,8 @@ Thus, we can rewrite the code above as:
 String.any().ascii().ofLength(2..42)
 ```
 
-You'll find configurable arbitraries for Strings, characters, numbers, collections, dates, times and many others.
+You'll find configurable arbitraries for Strings, characters, numbers, collections, 
+dates, times and many others.
 The Kotlin module adds APIs for `IntRange` and `Sequence`.
 To get a feeling for the breadth of available options look at 
 [this section](https://jqwik.net/docs/current/user-guide.html#customized-parameter-generation)
