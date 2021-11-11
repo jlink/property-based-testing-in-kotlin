@@ -8,11 +8,10 @@ import net.jqwik.kotlin.api.combine
 
 class PokerDomain : DomainContextBase() {
     @Provide
-    fun cards(): Arbitrary<PlayingCard> {
-        val suit = Enum.any<Suit>()
-        val rank = Enum.any<Rank>().filter { r: Rank -> r !== Rank.JOKER }
-        return combine(suit, rank) { s: Suit, r: Rank -> PlayingCard(s, r) }.withoutEdgeCases()
-    }
+    fun cards(): Arbitrary<PlayingCard> =
+        combine(Enum.any(), Enum.any()) { s: Suit, r: Rank ->
+            PlayingCard(s, r)
+        }.withoutEdgeCases()
 
     @Provide
     fun decks(): Arbitrary<List<PlayingCard>> {

@@ -1,6 +1,7 @@
 package pbt.kotlin.jqwik.cards
 
 import net.jqwik.api.ForAll
+import net.jqwik.api.GenerationMode
 import net.jqwik.api.Property
 import net.jqwik.api.domains.Domain
 import net.jqwik.api.domains.DomainContext
@@ -16,9 +17,10 @@ import org.assertj.core.api.Assertions.assertThat
 )
 class PokerProperties {
 
-    @Property
+    @Property//(generation = GenerationMode.RANDOMIZED)
     @PerProperty(All52Cards::class)
     fun `all 52 possible cards are generated`(@ForAll card: PlayingCard) {
+        Statistics.collect(card)
         println(card)
     }
 

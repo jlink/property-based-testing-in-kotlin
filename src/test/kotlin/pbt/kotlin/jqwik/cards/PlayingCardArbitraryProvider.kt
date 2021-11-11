@@ -14,7 +14,7 @@ class PlayingCardArbitraryProvider : ArbitraryProvider {
         subtypeProvider: ArbitraryProvider.SubtypeProvider
     ): Set<Arbitrary<out Any>> {
         val suit = Enum.any<Suit>()
-        val rank = Enum.any<Rank>().filter { r: Rank -> r !== Rank.JOKER }
+        val rank = Enum.any<Rank>()
         return setOf(combine(suit, rank, ::PlayingCard).withoutEdgeCases())
     }
 }

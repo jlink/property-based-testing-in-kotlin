@@ -788,16 +788,19 @@ sometimes one tends to be more concise (i.e. less code) than the other.
 
 ### Providing Generators through Domain Contexts
 
-In most examples I showed so far, generators / arbitraries were handed in through provider functions.
-This is convenient, since it allows to have the specification of generated data 
+In most examples you've seen so far, arbitraries were handed in through provider functions.
+This is convenient, since it allows us to have the specification of generated data 
 close to the property function itself.
+
 One thing with this approach is difficult, though: 
 Sharing generators across container classes is not easily possible.
-You _could_ move common generation logic into a helper class and then delegate to it from provider functions,
-which _must_ reside in the class of the property function, or in a supertype, 
+You _could_ move common generation logic into a helper class 
+and then delegate to this class from provider functions.
+Provider functions _must_ reside in the class of the property function, or in a supertype, 
 or in the case of nested inner classes in one of its containing classes.
 
-Enter jqwik's concept of _domains_. 
+Enter jqwik's concept of _domains_: 
+
 A "domain" is a collection of arbitrary providers and configurators that belong together.
 In concrete programming terms:
 - It's a class that has to implement `net.jqwik.api.domains.DomainContext` or, in most cases,
@@ -813,28 +816,27 @@ the `@Provide` annotation included.
 
 To demonstrate this, I've chosen Poker, the card game, as an example.
 It comes with four domain types:
-- enum class `Suit`: SPADES, HEARTS, DIAMONDS, CLUBS
-- enum class `Rank`: JOKER, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
-- data class `PlayingCard(val suit: Suit, val rank: Rank)`
-- data class `Hand(val cards: List<PlayingCard>)`
+- `enum class Suit`: SPADES, HEARTS, DIAMONDS, CLUBS
+- `enum class Rank`: TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
+- `data class PlayingCard(val suit: Suit, val rank: Rank)`
+- `data class Hand(val cards: List<PlayingCard>)`
 
 What we'll need to generate for testing a Poker engine or a Poker AI are:
-- Individual playing cards
+- Individual playing cards, chosen randomly out of the 52 possible cards
 - A full deck of 52 cards, shuffled
-- Valid Hands with no duplicate cards
+- Valid Hands of 5 cards with no duplicates
 - Two or more hands out of a deck
 - etc.
 
-All these generators can be placed as functions to a domain context class:
+All these generators can be placed as functions in a domain context class:
 
 ```kotlin
 class PokerDomain : DomainContextBase() {
   @Provide
-  fun cards(): Arbitrary<PlayingCard> {
-    val suit = Enum.any<Suit>()
-    val rank = Enum.any<Rank>().filter { r: Rank -> r !== Rank.JOKER }
-    return combine(suit, rank) { s: Suit, r: Rank -> PlayingCard(s, r) }.withoutEdgeCases()
-  }
+  fun cards(): Arbitrary<PlayingCard> =
+    combine(Enum.any(), Enum.any()) { s: Suit, r: Rank ->
+      PlayingCard(s, r)
+    }.withoutEdgeCases()
 
   @Provide
   fun decks(): Arbitrary<List<PlayingCard>> {
@@ -857,18 +859,28 @@ class PokerDomain : DomainContextBase() {
 }
 ```
 
-In addition to the `@Provide` annotation, the return type of the provider function plays an important role:
-The variable part inside `Arbitrary<..>` is used to match the type of a property function's for-all-parameter.
-Provider functions in domains supersede standard rules.
-That means that `fun decks(): Arbitrary<List<PlayingCard>>` will be used for all lists of `PlayingCard`s;
+In addition to the `@Provide` annotation, the return type of the provider function 
+plays an important role:
+The variable part inside `Arbitrary<..>` is used to match the type 
+of a property function's for-all-parameter.
+Provider functions in domains supersede standard rules for generating lists, sets and so on.
+That means that `@Provide fun decks(): Arbitrary<List<PlayingCard>>` 
+will be used for all lists of `PlayingCard`s;
 constraining annotations like `@Size` do not work on them.
 
-With `PokerDomain` in place property functions can simply use the type of values they want to be generated:
+With class `PokerDomain` in place property functions can simply use 
+the type of values they want to be generated:
 
 ```kotlin
 @Domain(PokerDomain::class)
 class PokerProperties {
-    @Property
+
+  @Property
+  fun `all 52 possible cards are generated`(@ForAll card: PlayingCard) {
+    Statistics.collect(card)
+  }
+
+  @Property
     fun `shuffled decks are generated`(@ForAll deck: List<PlayingCard>) {
         assertThat(deck).hasSize(52)
         assertThat(HashSet(deck)).hasSize(52)
@@ -891,17 +903,66 @@ class PokerProperties {
 }
 ```
 
-These three properties verify that the generators work as expected.
-Now you have the tools to start implementing and testing the actual Poker engine!
+These verify that the generators work as expected.
+The first one does the verification by collecting statistical values about
+the frequency of cards being generated.
+You might expect that a 1000 tries will result in a more or less equal distribution of the 52 cards.
+But something else is happening here, as we seen when looking at the report:
+
+```
+[PokerProperties:all 52 possible cards are generated] (52) statistics = 
+    FOUR of HEARTS    (1) :  2 %
+    JACK of SPADES    (1) :  2 %
+    ..
+    TWO of SPADES     (1) :  2 %
+    KING of HEARTS    (1) :  2 %
+
+PokerProperties:all 52 possible cards are generated = 
+                              |-------------------jqwik-------------------
+tries = 52                    | # of calls to property
+checks = 52                   | # of not rejected calls
+...
+```
+
+The property function was run exactly 52 times - instead of 1000 times, 
+and each card was generated exactly once!
+That cannot be a coincidence - and it is none.
+
+What we see here is __exhaustive generation__:
+Whenever jqwik is able to figure out that generating all possible values results
+in fewer tries than the standard number of tries, 
+it's going for all possible values and then stops.
+We can switch this behaviour off by adding an attribute to our annotation:
+
+```
+@Property(generation = GenerationMode.RANDOMIZED) 
+fun `all 52 possible cards are generated`(@ForAll card: PlayingCard) {...}
+```
+
+Running the property again shows a "more random" distribution:
+
+```
+[PokerProperties:all 52 possible cards are generated] (1000) statistics = 
+    SIX of SPADES     (29) :  3 %
+    FIVE of CLUBS     (27) :  3 %
+    TEN of HEARTS     (27) :  3 %
+    FIVE of DIAMONDS  (27) :  3 %
+    ...
+    EIGHT of CLUBS    (12) :  1 %
+    QUEEN of SPADES   (10) :  1 %
+```
+
+With the generators in `PokerDomain` in place,
+you now have the tools to start implementing and testing the actual Poker engine!
 
 #### Advanced Usage of Domains
 
-There's one caveat you should be aware of: 
-As soon as you apply a domain to your property or property class, 
-all built-in generators for Strings, numbers etc. are no longer available by default.
+There's one caveat with `@Domain` you should be aware of: 
+As soon as you apply at least one domain to your property or property class, 
+all built-in generators for strings, numbers etc. are no longer available by default.
 To enable them you have to additionally add `@Domain(DomainContext.Global::class)`.
 Since Kotlin does not support repeatable annotations (yet),
-add more than one annotation looks a bit cumbersome:
+adding more than one annotation looks a bit cumbersome:
 
 ```kotlin
 @DomainList(
@@ -913,7 +974,8 @@ add more than one annotation looks a bit cumbersome:
 Provider functions are just the simplest way of adding generators to a domain.
 A domain can also have full-fledged arbitrary providers and arbitrary configurators.
 Look at [Domain and Domain Contexts](https://jqwik.net/docs/current/user-guide.html#domain-and-domain-context)
-in jqwik's user guide for the full functionality available.
+in jqwik's user guide to learn about the full functionality of domain contexts
+and `DomainContextBase`.
 
 
 ### Registering Generators for Global Use
