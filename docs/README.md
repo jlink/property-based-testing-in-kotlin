@@ -519,7 +519,7 @@ in jqwik's user guide.
 ### Transforming Individual Arbitraries
 
 Having an existing generator of type `Arbitrary<T>` allows you to do many useful things with it.
-Here's an extract of interface `Arbitrary`:
+Here's a selection of useful functions in interface `Arbitrary`:
 
 ```java
 public interface Arbitrary<T> {
@@ -539,7 +539,7 @@ public interface Arbitrary<T> {
 #### Filtering
 
 Filtering is about including values that fulfill a predicate.
-For generating only even numbers between 2 and 100000:
+Use the following snippet for generating only even numbers between 2 and 100000:
 
 ```kotlin
 Int.any(2..100000).filter {it % 2 == 0}
@@ -548,17 +548,17 @@ Int.any(2..100000).filter {it % 2 == 0}
 #### Mapping
 
 Mapping is about using a generated value to produce another one.
-This allows another approach for even numbers between 2 and 100000:
+This enables a different approach for even numbers between 2 and 100000:
 
 ```kotlin
 Int.any(2..50000).map {it * 2}
 ```
 
-You can map to different types. 
-We use that here for creating the HEX value of an integer:
+You can map to different types, too. 
+Here's an example for creating the HEX value of an integer:
 
 ```kotlin
-Int.any(1..Int.MAX_VALUE).map { it.toString(16)}
+Int.any(1..Int.MAX_VALUE).map { it.toString(16) }
 ```
 
 ### Creating Collections and other Multi-Value Types
@@ -579,8 +579,8 @@ Due to the existence of primitive array types in Java, the creation of arrays re
 Double.any().array(Array<Double>::class.java).ofSize(10)
 ```
 
-In Kotlin, we have a bit more flexibility, so here's the version using reified types,
-which saves you two characters:
+In Kotlin, we have a bit more flexibility, so here's the version using an extension method
+that saves you two characters:
 
 ```kotlin
 Double.any().array<Double, Array<Double>>().ofSize(10)
@@ -590,16 +590,20 @@ You decide which one you prefer.
 
 ### Flat Mapping
 
-_Flat Mapping_ is one of the magic words you have to use if you want to belong to the functional crowd.
+_Flat Mapping_ is one of the magic words you should consider injecting 
+into your conversation with the functional crowd - if you want to belong.
 The idea behind it is straightforward: 
 Instead of using a (generated) value to produce another value, which is a plain _map_,
 you produce another _arbitrary_ instead.
 
 Why is that useful?
-Now and then you want to generate several arbitrary values; 
-but the values are not fully independent of each other but there's some condition linking the two values.
-Imagine you had to verify that `List<T>.index(t)` returns the correct index for elements that are present in the list.
-Here's a property trying to check that property:
+Now and then you want to generate several arbitrary values together. 
+However, the values are not independent of each other, 
+but there's some condition linking two or more values.
+
+Imagine you had to verify that `List<T>.index(t)` returns the correct index 
+for elements that are present in the list.
+Here's a property trying to check that quality:
 
 ```kotlin
 @Property
@@ -623,8 +627,8 @@ Shrunk Sample (2 steps)
 ```
 
 The problem at hand: the generated value for _index_ does not consider the number of elements 
-in the generated list; but it should to make the property really a falsifiable one.
-Flat mapping comes to our rescue:
+in the generated list; but it should.
+Flat mapping comes to our rescue here:
 
 ```kotlin
 @Property
@@ -641,11 +645,11 @@ fun listWithValidIndex() : Arbitrary<Pair<List<Int>, Int>> {
 }
 ```
 
-The magic happens in the line with the `return` statement:
+The magic happens in the `return` statement:
 The size of the generated `list` is used to constrain the upper border of the index generator.
 The final trick is to return the two values, the `list` and the `index`, together as a `Pair`.
 
-As a surprise to me, the property still fails:
+Surprisingly - at least I didn't expect it - the property still fails:
 
 ```
 FlatMappingExamples:index works for element in list = 
@@ -658,7 +662,7 @@ Shrunk Sample (86 steps)
   listWithIndex: ([0, 0], 1)
 ```
 
-Our property did not consider duplicate elements in the list.
+The property does not consider duplicate elements in the list.
 One way to get rid of that problem is to make sure elements are unique:
 
 ```kotlin
@@ -669,7 +673,7 @@ fun listWithValidIndex() : Arbitrary<Pair<List<Int>, Int>> {
 }
 ```
 
-Et voilà, everything running fine now.
+Et voilà, everything's running fine now.
 
 
 ### Assumptions
