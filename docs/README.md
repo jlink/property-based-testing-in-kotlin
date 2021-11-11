@@ -24,8 +24,8 @@ It covers the application of PBT in Kotlin using
 ## Table of Contents  
 
 - [A Short Intro to PBT](#a-short-intro-to-pbt)
-- [Jqwik, JUnit Platform and Kotlin](#jqwik-junit-platform-and-kotlin)
-- [Setting Up Jqwik](#setting-up-jqwik)
+- [Jqwik and the JUnit Platform](#jqwik-and-the-junit-platform)
+- [Setting Up Jqwik for Kotlin](#setting-up-jqwik-for-kotlin)
 - [Success, Failure and Shrinking](#success-failure-and-shrinking)
 - [Generators (aka Arbitraries)](#generators-aka-arbitraries)
   - [Programming Generators](#programming-generators)
@@ -123,7 +123,7 @@ Here are two articles to get you started, one of them from myself:
 - [Know for Sure](https://blogs.oracle.com/javamagazine/post/know-for-sure-with-property-based-testing)
 
 
-## Jqwik, JUnit Platform and Kotlin
+## Jqwik and the JUnit Platform
 
 As you have seen above _jqwik_ follows JUnit's lead in using an annotation (`@Property`) 
 to mark a plain function as an executable property. 
@@ -133,9 +133,9 @@ but you all know it from years of JUnit anyway.
 Another thing that jqwik does for you is to use the types of parameters annotated with `@ForAll`
 to select an appropriate _generator_ for this parameter.
 For example, the parameter `@ForAll aList: List<Int>` will generate lists of `Int` objects for you.
-Many generators come with associated configurator annotations to further restrict and influence them.
+Many generators come with associated annotations to configure, restrict and influence them.
 
-Let's look at a more complex property combining all of that:
+Let's look at a more complicated property:
 
 ```kotlin
 @Property(tries = 100)
@@ -154,15 +154,19 @@ fun `can add up to 10 team members to a project`(
 }
 ```
 
-In this example you can see that configuration annotations can also be added to type parameters.
-This property also changes the number of _tries_, which is 1000 by default, to 100.
+In this example you can see that configuration annotations can be added to type parameters, too.
+In this property I've also changed the number of _tries_, which is 1000 by default, to 100.
 
 _jqwik_ is not an independent library, but it comes as a _test engine_ for the 
 [JUnit platform](https://junit.org/junit5/docs/current/user-guide/#overview-what-is-junit-5).
+If you want to learn more about how test engines work 
+[this series of articles](https://blogs.oracle.com/javamagazine/post/junit-build-custom-test-engines-java) 
+may interest you.
+
+## Setting Up Jqwik for Kotlin
+
 Despite its original focus on Java, jqwik has worked well with Kotlin for a long time.
 As of version `1.6.0` there's an additional Kotlin module which makes the experience even smoother.
-
-## Setting Up Jqwik
 
 If you're already using JUnit 5, the set up for jqwik is really easy: 
 Just add a dependency to `jqwik.net:jqwik-kotlin:<version>`. 
