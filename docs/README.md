@@ -170,7 +170,7 @@ As of version `1.6.0` there's an additional Kotlin module which makes the experi
 
 If you're already using JUnit 5, the set up for jqwik is really easy: 
 Just add a dependency to `jqwik.net:jqwik-kotlin:<version>`. 
-In practice I recommend to add a few compiler options to make your life easier.
+In practice, I recommend adding a few compiler options to make your life easier.
 Here's how you can do that in a Gradle Kotlin-based build file:
 
 ```
