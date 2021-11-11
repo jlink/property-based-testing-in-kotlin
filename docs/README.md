@@ -732,7 +732,7 @@ Conclusion: Be careful with assumptions that throw away (too) many generated sam
 
 ### Combining Generators
 
-We've already seen the most common way to combine two or more arbitraries into a more complicated one.
+We've already seen the most common way to combine two or more arbitraries.
 The pattern, which scales up to 8 arbitraries, looks as follows:
 
 ```kotlin
@@ -745,12 +745,25 @@ combine(arbitrary1, arbitrary2, arbitrary3) { t1, t2, t3 ->
 }
 ```
 
-If you need `t1..n` to configure another generator `flatCombine(..)` is what you need.
+If you need `t1..n` to configure another generator `flatCombine(..)` 
+is what you can use.
 
 There is another way to do something similar using a _builder_-based approach.
 _Builders_ collect information required for construction - often in functions starting `with...` -
 and then create the desired result type in a single step, e.g. by calling `build()`.
 Using that approach the `Player` example from above could look as follows:
+
+```kotlin
+class PlayerBuilder() {
+    fun withNickname(nickname: String): PlayerBuilder {...}
+
+    fun withRanking(ranking: Int): PlayerBuilder {...}
+
+    fun withPosition(position: String): PlayerBuilder {...}
+
+    fun build() : Player {...}
+}
+```
 
 ```kotlin
 @Provide
@@ -767,10 +780,10 @@ fun players() : Arbitrary<Player> {
 Using `Builders.withBuilder(..)` makes sense if:
 - You already have builder classes for your domain type
 - You have more than 8 attributes to combine
-- You consider the builder syntax more readable
+- You consider the builder syntax to be more readable
 
 In the end `combine(..)` and builders are equivalent; 
-sometimes one tends to be more concise (read: less code) than the other.
+sometimes one tends to be more concise (i.e. less code) than the other.
 
 
 ### Providing Generators through Domain Contexts
