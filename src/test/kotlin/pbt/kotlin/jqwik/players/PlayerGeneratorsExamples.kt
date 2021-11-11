@@ -28,7 +28,7 @@ class PlayerGeneratorsExamples {
 
     fun nicknames() : Arbitrary<String> = String.any().alpha().numeric().ofLength(1..12)
 
-    fun rankings() : Arbitrary<Int> = Int.any(0..1000)
+    fun rankings() : Arbitrary<Int> = Int.any(0..999)
 
     fun positions() : Arbitrary<String> = Arbitraries.of("dealer", "forehand", "middlehand")
 

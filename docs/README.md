@@ -28,11 +28,11 @@ It covers the application of PBT in Kotlin using
 - [Setting Up Jqwik for Kotlin](#setting-up-jqwik-for-kotlin)
 - [Success, Failure and Shrinking](#success-failure-and-shrinking)
 - [Generators (aka Arbitraries)](#generators-aka-arbitraries)
+  - [Configuration through Annotation](#configuration-through-annotation)
   - [Programming Generators](#programming-generators)
     - [Generate by Type](#generate-by-type)
     - [Choosing Constrained Base Arbitraries](#choosing-constrained-base-arbitraries)
   - [Configuring, Transforming and Combining Arbitraries](#configuring-transforming-and-combining-arbitraries)
-    - [Configuration through Annotation](#configuration-through-annotation)
     - [Configuration through Fluent API](#configuration-through-fluent-api)
   - [Transforming Individual Arbitraries](#transforming-individual-arbitraries)
     - [Filtering](#filtering)
@@ -303,38 +303,61 @@ if it works as expected, which it usually does.
 
 ## Generators (aka Arbitraries)
 
-_jqwik_ comes with quite a few built-in generators for many of Java's and Kotlin's fundamental types.
+_jqwik_ comes with quite a few built-in generators for many of Java's and Kotlin's fundamental classes and types.
 When it comes to your own programs, however, you'll soon have the desire to generate objects of your specific target domain.
+
+### Configuration through Annotation
+
+The simplest way to influence what your generators produce is by using specific annotations,
+the purpose of which is to provide information about constraints.
+You have already seen a few of those annotations:
+- `@Size` can constraining the size of multi-value types like `List`, `Set`, arrays and others.
+- `@NotBlank` tells String generators to never generate blank Strings (empty or whitespace only).
+- `@Email` to use an email-specifc String generator instead of the default one.
+
+There's many of them; and their number is constantly growing.
+They are described in the user guide's chapter on [Constraining Default Generation](https://jqwik.net/docs/current/user-guide.html#constraining-default-generation)
+and in the chapters for optional modules like 
+[web](https://jqwik.net/docs/current/user-guide.html#web-module) and 
+[time](https://jqwik.net/docs/current/user-guide.html#time-module).
+
+Eventually you will have to concede, though, that the writers of jqwik will never be able 
+to fulfill all your domain-specific needs.
+Therefore, there must be a way to build generators of your own liking with _programming_,
+as opposed to just _specifying_ them through types and annotations.
+
 
 ### Programming Generators
 
-To build a domain-specific generator the procedure is usually as follows:
+To "program" a domain-specific generator the procedure is usually as follows:
 - Identify the base types from which to build your domain type.
 - Choose and configure the generators for your base types.
 - Map, filter and combine the base generators into building instances of your domain type.
 - Use your domain type generators for composing more complex domain generators if necessary.
 
-Although they are often called _generators_, in jqwik they are represented by the interface `Arbitrary<T>`,
+Although they are often called "generators", in jqwik they are represented by the interface `Arbitrary<T>`,
 where `T` is the type of the values to generate.
-Think of `Arbitrary` as an abstraction for _factories of generators_.
+Think of `Arbitrary<T>` as a shorthand for _factory of generators for arbitrary objects of type T_.
 This abstraction comes with a lot of useful features to transform and combine it; 
 functional programmers may even call it _monadic_.
 
-Let's look at how to build an arbitrary for the following type, 
+Let's look at how to build an arbitrary for the `Player` type, 
 which is supposed to represent participants of a card game:
 
 ```kotlin
 data class Player(val nickname: String, val ranking: Int, val postion: String)
 ```
 
-I've chosen to use a data class here to make the code compact, not because it's necessarily the best option.
+I've chosen to use a data class here to make the code compact, 
+not because it's necessarily the best option.
 Using a fully fledged class would not change the approach towards building a generator.
 
 #### Generate by Type
 
 A `Player` has a nickname of type `String`, a ranking of type `Int` and a position that's also a `String`.
-When all underlying types are built into jqwik (or made known to jqwik) there's a very simple way 
-for generating instances of a given type by using `Arbitraries.forType(Class<T>)`.
+When all underlying types have generators built into jqwik 
+(or [made available](#registering-generators-for-global-use) to jqwik) 
+there's a very simple way for generating instances of a given type: just call `anyForType<T>`.
 Let's try that with `Player`:
 
 ```kotlin
@@ -347,15 +370,17 @@ fun playersFromType(@ForAll("playersByType") player: Player) {
 fun playersByType() : Arbitrary<Player> = anyForType<Player>()
 ```
 
-In this example you can see how you can tell a parameter to use a generator from a _provider function_:
-Make a function that returns an `Arbitrary<YourDomainType>`, 
-position this function in the same container as your property function,
-add annotation `@Provide` to the function
-and use the function's name in the parameter's `ForAll` annotation.
+In this example you can see how to match a parameter with its specific generator 
+by using a _provider function_:
+1. Implement a function that returns an `Arbitrary<YourDomainType>`, 
+2. position this function in the same container class as your property,
+3. add annotation `@Provide` to the function
+4. and use the function's name as value in the parameter's `ForAll` annotation.
 
-Often, the explicit return type can be left out since it will be automatically inferred by the Kotlin compiler. 
-Mind that in this exact example either the function's return type or the explicit type parameter
-of `anyForType<Player>()` is necessary.
+Often, the explicit return type can be left out, 
+since it will be automatically inferred by the Kotlin compiler. 
+Mind that in this exact example either the function's return type 
+or the explicit type parameter of `anyForType<Player>()` is necessary.
 
 When we run this example, the output will look something like
 
@@ -374,25 +399,27 @@ Player(nickname=⟌, ranking=-2631, position=㾣행跎)
 ```
 
 Without further information, jqwik will generate 
-- an _arbitrary_ string as `nickname` and `position` - even empty strings or unprintable Unicode chars are within range
+- an _arbitrary_ string as `nickname` and `position` - 
+  even empty strings or unprintable Unicode chars are within range
 - an _arbitrary_ number of type `Int` - negatives and zero are possible
 
 This might be what you want; 
-in many cases, however, meaningful values are more restricted than what the plain Kotlin or Java type can tell us.
+in many cases, however, meaningful domain values are more restricted 
+than what the plain Kotlin or Java type can tell us.
 
 #### Choosing Constrained Base Arbitraries
 
-Let's assume the following constraints for a player's attributes:
+Let's assume the following constraints for a player's attributes must hold:
 - Nicknames must have a length of 1 to 12 characters.
-- Nicknames can contain English upper and lowercase letters as well as the digits `0` to `9`.
-- A player's ranking is between `0` and `999`.
-- There are only three possible positions: `dealer`, `forehand` and `middlehand`
+- Nicknames can only contain English uppercase and lowercase letters as well as the digits `0` to `9`.
+- A player's ranking can be between `0` and `999`.
+- There are only three possible positions in our card game: `dealer`, `forehand` and `middlehand`
 
-This is all we need to know to come up with the three base generators:
+This is all we need to know to come up with our three base generators:
 
 ```kotlin
 fun nicknames() : Arbitrary<String> = String.any().alpha().numeric().ofLength(1..12)
-fun rankings() : Arbitrary<Int> = Int.any(0..1000)
+fun rankings() : Arbitrary<Int> = Int.any(0..999)
 fun positions() : Arbitrary<String> = Arbitraries.of("dealer", "forehand", "middlehand")
 ```
 
@@ -403,14 +430,14 @@ Having those three in place we just combine them into a provider function for pl
 fun players() = combine(nicknames(), rankings(), positions()) {n, r, p -> Player(n, r, p)}
 ```
 
-or even more compact, but less readable:
+or even more compact, but in my opinion less readable:
 
 ```kotlin
 @Provide
 fun players() = combine(nicknames(), rankings(), positions(), ::Player)
 ```
 
-Running now the property
+Running the property now
 
 ```kotlin
 @Property
@@ -425,7 +452,7 @@ produces something more to our liking:
 Player(nickname=a, ranking=2, position=dealer)
 Player(nickname=A, ranking=0, position=dealer)
 Player(nickname=z, ranking=0, position=dealer)
-Player(nickname=RwClZUm7fPQ, ranking=1000, position=forehand)
+Player(nickname=RwClZUm7fPQ, ranking=999, position=forehand)
 Player(nickname=7ggjAy1RK, ranking=721, position=forehand)
 Player(nickname=z, ranking=0, position=dealer)
 Player(nickname=TyfnGRbpqav1, ranking=234, position=dealer)
@@ -437,21 +464,9 @@ Player(nickname=5F, ranking=5, position=middlehand)
 
 ### Configuring, Transforming and Combining Arbitraries
 
-With the `combine` function we have already seen one of the fundamental ways to use an arbitrary (or several)
-in order to arrive at another one.
-There's much more, though.
-
-#### Configuration through Annotation
-
-The simplest way to influence what your generators produce is by using specific annotations,
-the purpose of which is to provide information about constraints.
-You have already seen a few of those annotations:
-- `@Size` can constraining the size of multi-value types like `List`, `Set`, arrays and others.
-- `@NotBlank` tells String generators to never generate blank Strings (empty or whitespace only).
-
-There's many of them; and their number is constantly growing.
-They are described in the user guide's chapter on [Constraining Default Generation](https://jqwik.net/docs/current/user-guide.html#constraining-default-generation).
-
+With the `combine` function we have already seen one of the fundamental ways 
+to use several arbitraries together for building another one.
+There's much more, though, that can be done with arbitraries.
 
 #### Configuration through Fluent API
 
