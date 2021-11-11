@@ -194,7 +194,7 @@ for fully configured examples for Gradle and Maven.
 
 ## Success, Failure and Shrinking
 
-Now that you can run your own properties it's worthwhile to look at jqwik's output and reporting. 
+Now that you can run your own properties it's worthwhile to look at jqwik reporting. 
 When we run this property from above:
 
 ```kotlin
@@ -220,14 +220,16 @@ edge-cases#tried = 10         | # of edge cases tried in current run
 seed = -8839434152225186972   | random seed to reproduce generated values
 ```
 
-With default configuration this report will be published for each and every property.
+With default [configuration](https://jqwik.net/docs/current/user-guide.html#jqwik-configuration) 
+this report will be published for each and every property.
 It tells you how often a property function has been started (`tries`), 
 how often it has actually been evaluated (`checks`),
 the random `seed` that can be used for replicating the exact same generated test data,
-and other information of lesser interest.
+and other information of lesser importance.
 
-Let's see what happens if a property fails.
-The following property suggests that `list.reversed()` does nothing:
+Let's see what happens when a property run fails.
+The following property suggests that `list.reversed()` does nothing - 
+which is, of course, wrong:
 
 ```kotlin
 @Property
@@ -236,7 +238,7 @@ fun `reversing keeps the list unchanged`(@ForAll list: List<Int>) {
 }
 ```
 
-It produces a report similar to this:
+Running it produces a report similar to this:
 
 ```
 ReverseProperties:reversing keeps the list unchanged = 
@@ -263,23 +265,23 @@ Original Sample
 ---------------
   list:
     [
-      -5459970, -113449, -15929, 151198, -657, -50279, 47614, 5813, 972, -23847, 1227, -19, -111, 
-      -12, -4380, 205, 51669, 20, 984
+      -5459970, -113449, -15929, 151198, -657, -50279, 47614, 5813, 972, ...
     ]
 ```
 
 In addition to the `AssertionFailedError` two sets of data are being shown:
 the _original sample_ and the _shrunk sample_.
 Both show data that make the property fail. 
-Whereas the former is (pseudo-)randomly generated, the latter is the result of _shrinking_ the original set.
+Whereas the former is (pseudo-)randomly generated, the latter is the result of _shrinking_ the original set of values.
 _Shrinking_ is PBT lingo for taking the original failing sample, making it somewhat "smaller" 
-and re-running the property function with this simplified version, until no smaller sample can be found.
+and re-running the property function with this simplified version.
+This _shrinking phase_ continues until no smaller sample can be found.
 
 Shrinking has two big advantages:
-- It provides you with a sample that has less complexity and that is therefore easier to reason about.
-  In the ideal case, you have now the simplest failing sample, with no accidental complexity.
-- If it works perfectly - which it often does not - it will always shrink to the exact same sample.
-  That means less non-determinism in your tests, which is a major factor for continuous integration.
+- It provides you with a sample that has less complexity and is therefore easier to reason about.
+  In the ideal case, you now have the simplest failing set of values, with no accidental complexity.
+- If it works perfectly - which it often does not - shrinking will consistently produce the exact same smallest sample.
+  That means less non-determinism in your tests, which is an essential factor in continuous integration and delivery.
 
 Shrinking is a major differentiator when it comes to comparing PBT libraries with each other.
 Libraries usually follow one of two approaches:
@@ -292,9 +294,11 @@ Libraries usually follow one of two approaches:
 Another characteristic to differentiate between shrinking approaches is  
 [type-based versus integrated shrinking](https://hypothesis.works/articles/integrated-shrinking/).
 
-_jqwik_ is a strict proponent of shrinking being an intrinsic part of generation - with some tweaking possible.
+_jqwik_ is a strong proponent of shrinking being an intrinsic part of generation - 
+with some tweaking possible.
 It also comes with fully integrated shrinking.
-For the user of a library that's the all-round carefree package, if it works as expected, which it usually does.
+For the user of a library that's the all-round carefree package, 
+if it works as expected, which it usually does.
 
 
 ## Generators (aka Arbitraries)
