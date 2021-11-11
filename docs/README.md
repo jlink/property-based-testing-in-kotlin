@@ -727,7 +727,7 @@ tries = 1000                  | # of calls to property
 checks = 463                  | # of not rejected calls
 ```
 
-Conclusion: Be careful with assumptions that might throw away many generated samples.
+Conclusion: Be careful with assumptions that throw away (too) many generated samples.
 
 
 ### Combining Generators
