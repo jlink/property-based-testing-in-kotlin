@@ -678,7 +678,7 @@ Et voilà, everything's running fine now.
 
 ### Assumptions
 
-In a way, flat mapping over arbitraries is a rather involved way to deal with dependencies across.
+In a way, flat mapping over arbitraries is a rather involved way to deal with data dependencies.
 A simpler and sometimes more natural way to reach the same goal are assumptions.
 An assumption is a filter that can use all parameters of a property function: 
 
@@ -694,16 +694,18 @@ fun `index works for element in lis`(
 }
 ```
 
-Here, the assumption `Assume.that(index >= 0 && index < list.size)` makes sure 
-that only if `index` is in the valid range, the property will proceed to run.
-This filtering out can, however, lead to a lot of test cases that are generated but thrown away afterwards.
+Here, the line `Assume.that(index >= 0 && index < list.size)` makes sure 
+that only if `index` is in the valid range, the property will proceed to run the check.
+This filtering out can, however, lead to a lot of test cases 
+that are generated but thrown away afterwards as invalid.
 If too many are thrown away, jqwik will complain and fail:
 
 ```
 Property [FlatMappingExamples:index works for element in list - using assumption] exhausted after [1000] tries and [930] rejections
 ```
 
-We can mitigate that problem by constraining the initial set of generated test cases; for example:
+We can mitigate that problem by constraining the initial set of generated test cases; 
+for example like that:
 
 ```kotlin
 @Property
@@ -715,8 +717,8 @@ fun `index works for element in list`(
 }
 ```
 
-This should succeed, but still, the report shows that more than half 
-of the generated test cases are being thrown away:
+This should succeed; 
+but still, the report shows that more than half of the generated test cases are being thrown away:
 
 ```
 FlatMappingExamples:index works for element in list = 
@@ -724,6 +726,8 @@ FlatMappingExamples:index works for element in list =
 tries = 1000                  | # of calls to property
 checks = 463                  | # of not rejected calls
 ```
+
+Conclusion: Be careful with assumptions that might throw away many generated samples.
 
 
 ### Combining Generators
