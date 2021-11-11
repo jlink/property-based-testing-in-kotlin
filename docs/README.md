@@ -1,6 +1,6 @@
 # Property-based Testing in Kotlin
 
-#### Last Update: November 10, 2021
+#### Last Update: November 11, 2021
 
 ##### _This is work in progress. Please provide feedback on [Twitter](https://twitter.com/johanneslink)_
 
@@ -14,8 +14,9 @@ Some of the few articles and resources I found are
 - [A short blog series](https://medium.com/default-to-open/property-based-testing-in-kotlin-part-1-56929927b8b8)
 - [A chapter of "The Joy of Kotlin"](https://livebook.manning.com/book/the-joy-of-kotlin/b-property-based-testing-in-kotlin/v-8/156)
 
-To fill the gap a bit this article covers the application of PBT in Kotlin 
-using [jqwik's](https://jqwik.net) [Kotlin module](https://jqwik.net/docs/snapshot/user-guide.html#kotlin-module).
+This article wants to fill the gap a little bit. 
+It covers the application of PBT in Kotlin using 
+[jqwik](https://jqwik.net) and [jqwik's Kotlin module](https://jqwik.net/docs/snapshot/user-guide.html#kotlin-module).
 
 <!-- Generated toc must be stripped of `nbsp` occurrences in links -->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -65,7 +66,8 @@ using [jqwik's](https://jqwik.net) [Kotlin module](https://jqwik.net/docs/snapsh
 
 ## A Short Intro to PBT
 
-You all know example-based tests, e.g. using JUnit Jupiter:
+You all know example-based tests, at least I hope you do. 
+This is prototypical example test using [JUnit Jupiter](https://junit.org/junit5/docs/current/user-guide/):
 
 ```kotlin
 @Test
@@ -75,13 +77,13 @@ fun `any list with elements can be reversed`() {
 }
 ```
 
-One of the problems with example-based tests is that they typically promise more than they can keep.
-Whereas they usually cover only a few examples, they want to make sure 
+One of the problems with example-based tests: They typically promise more than they can keep.
+They usually cover only a few examples, but they would like to make sure 
 that the code works for _all valid input_.
 
 Property-based tests, however, focus on common _properties_ (hence the name) of the code under test.
-While it's not straightforward to predict the outcome of any list reversal without re-implementing reverse first,
-there are a few things that should hold nonetheless:
+While it's not straightforward to predict the outcome of an arbitrary list's reversal without re-implementing reverse in your test,
+there are a few things that should be true nonetheless:
 
 - Reversing does not change the number of elements, nor the elements themselves
 - Reversing twice will recreate the original list
@@ -108,22 +110,27 @@ fun `reversing swaps first and last`(@ForAll @Size(min=2) list: List<Int>) {
 }
 ```
 
-To be frank, the _Reverse List_ example is probably the most common and also the most boring one. 
-If this is your first encounter with PBT, you should definitely get more motivation from other stories.
-Here are some articles, two of which from myself:
+When you run these tests through your IDE or Maven or Gradle, 
+each function will be executed 1000 times.
+Each execution will be different, though, since jqwik will generate a new list for each _try_.
+You will see later, how succeeding and failing property runs are reported.
+
+To be frank, the _Reverse List_ example is notorious and also rather boring. 
+If this is your first encounter with PBT, you should definitely get more motivation from other sources.
+Here are two articles to get you started, one of them from myself:
 
 - [In praise of property-based testing](https://increment.com/testing/in-praise-of-property-based-testing/)
 - [Know for Sure](https://blogs.oracle.com/javamagazine/post/know-for-sure-with-property-based-testing)
-- [How to Specify it. In Java!](https://johanneslink.net/how-to-specify-it/)
 
 
 ## Jqwik, JUnit Platform and Kotlin
 
 As you have seen above _jqwik_ follows JUnit's lead in using an annotation (`@Property`) 
-to mark plain functions as executable property. 
-This is not as common in the Kotlin world as it is in Java, but you all know it from years of JUnit anyway.
+to mark a plain function as an executable property. 
+This is not as common in the Kotlin world as it is in Java, 
+but you all know it from years of JUnit anyway.
 
-Another thing that jqwik does for you is using the types of parameters annotated with `@ForAll`
+Another thing that jqwik does for you is to use the types of parameters annotated with `@ForAll`
 to select an appropriate _generator_ for this parameter.
 For example, the parameter `@ForAll aList: List<Int>` will generate lists of `Int` objects for you.
 Many generators come with associated configurator annotations to further restrict and influence them.
