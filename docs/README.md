@@ -1,6 +1,6 @@
 # Property-based Testing in Kotlin
 
-#### Last Update: November 11, 2021
+#### Last Update: November 12, 2021
 
 ##### _This is work in progress. Please provide feedback on [Twitter](https://twitter.com/johanneslink)_
 
@@ -45,7 +45,9 @@ It covers the application of PBT in Kotlin using
     - [The Poker Domain](#the-poker-domain)
     - [Advanced Usage of Domains](#advanced-usage-of-domains)
   - [Registering Generators for Global Use](#registering-generators-for-global-use)
-- [Finding Good and Useful Properties](#finding-good-and-useful-properties)
+- [Finding Good Properties](#finding-good-properties)
+  - [Metamorphic Properties](#metamorphic-properties)
+  - [Further Material](#further-material)
 - [jqwik's Kotlin Support](#jqwiks-kotlin-support)
   - [Compatibility](#compatibility)
   - [Nullability](#nullability)
@@ -1004,14 +1006,66 @@ class PlayingCardArbitraryProvider : ArbitraryProvider {
 and [register it as a service provider](https://jqwik.net/docs/current/user-guide.html#providing-default-arbitraries)
 in `META-INF/services/net.jqwik.api.providers.ArbitraryProvider`.
 
-## Finding Good and Useful Properties
+## Finding Good Properties
 
 The mechanics of writing and running properties is one side of the coin.
 The other side, and arguably the more important one, is to find good properties 
 and to integrate Property-based testing into your development process.
 
-It's beyond the scope of this article to cover enough of this ground to make it worthwhile.
-That's why I'll provide you with a few pointers to earlier articles:
+PBT and its [first implementation QuickCheck](https://en.wikipedia.org/wiki/QuickCheck) 
+have been around for over 20 years. 
+During that time quite a few patterns and strategies have been discovered 
+to find good and useful properties.
+Here's my personal list of strategies to choose from:
+
+- Fuzzying
+- Postconditions
+- Inductive Testing
+- Metamorphic Properties
+- Black-box Testing
+- Test Oracle
+- Stateful Testing
+- Model-based Properties
+
+It's beyond the scope of this article to cover these to any useful degree of detail.
+That's why I'll provide you with a few pointers further down.
+One category, however, is so different from how we are used to think about example-based tests
+that I want to at least scratch its surface: _Metamorphic Properties_.
+
+### Metamorphic Properties
+
+In his seminal paper ["How to Specify it!"](https://www.dropbox.com/s/tx2b84kae4bw1p4/paper.pdf), 
+John Huges introduces __Metamorphic Properties__ like this:
+
+> "… even if the expected result of a function call […] may be difficult to predict, 
+> we may still be able to express an expected relationship between this result, 
+> and the result of a related call."
+
+Since this is a very generic statement I want to translate it into a concrete example:
+_When I know the result of summing up an arbitrary set of numbers,
+then the sum of these numbers __and__ an additional number X is the original sum plus X._
+
+Formulated as a jqwik property, this could look like:
+
+```kotlin
+fun sumUp(vararg numbers: Int) = numbers.sum()
+
+@Property
+fun `sum is enhanced by X`(@ForAll list: IntArray, @ForAll x: Int) : Boolean {
+    val original = sumUp(*list)
+    val sum = sumUp(*list, x)
+    return sum == original + x
+}
+```
+
+The basic idea behind metamorphic properties is behind some of the better known patters
+like "inverse operations", "idempotence" and "commutativity", 
+all of which are described in the articles listed below.
+
+### Further Material
+
+Here are the promised links to earlier articles of mine
+to get you started with techniques for finding good properties:
 
 - [Patterns to Find Properties](https://blog.johanneslink.net/2018/07/16/patterns-to-find-properties/)
 - [Stateful Testing](https://blog.johanneslink.net/2018/09/06/stateful-testing/)
@@ -1021,7 +1075,6 @@ That's why I'll provide you with a few pointers to earlier articles:
 
 Most examples in those articles use Java.
 I trust you to make the translation to Kotlin without much hassle.
-
 
 ## jqwik's Kotlin Support
 
