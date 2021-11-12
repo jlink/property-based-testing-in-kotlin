@@ -1083,7 +1083,7 @@ If they don't, it's usually due to a Kotlin convenience method like `String.any(
 which would translate to `Arbitraries.strings()` in jqwik's Java-based API.
 
 Idiomatic Kotlin, however, is more than just converting Java code into Kotlin syntax. 
-That's why - starting with version 1.6.0 - jqwik provides an optional Kotlin module with two main goals:
+That's why - starting with version 1.6.0 - jqwik offers an optional Kotlin module with two main goals:
 Smoothing off some rough edges when using the jqwik API in Kotlin 
 and supporting (some of) the additional features that Kotlin brings to the table.
 
@@ -1393,6 +1393,8 @@ or when you need a truly multi-platform library.
 ## Summary
 
 Property-based testing is a cool tool to enhance and partially replace example-based testing.
+Generating domain-specific objects is as important as coming up with good properties to check.
+
 jqwik, which originally is a Java library, now comes with a Kotlin module 
 to make its use with Kotlin smooth and comfortable.
 
