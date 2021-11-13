@@ -41,4 +41,9 @@ class PlainJqwikTests {
 
     @Property
     fun `positive is above 0`(@ForAll @Positive anInt: Int) = anInt > 0
+
+    @Property
+    fun `negative is below 0`(@ForAll @Negative anInt: Int) {
+        assert(anInt < 0, { "$anInt should be < 0" })
+    }
 }

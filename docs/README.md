@@ -1105,6 +1105,17 @@ That means that:
   fun `positive is above 0`(@ForAll @Positive anInt: Int) = anInt > 0
   ```
 
+- You can also use Kotlin's `assert` function, which - unlike Java's built-in `assert` -
+  is always evaluated. 
+  That allows you to use _jqwik_ and other testing framework without any additional assertion library:
+  
+  ```kotlin
+  @Property
+  fun `negative is below 0`(@ForAll @Negative anInt: Int) {
+    assert(anInt < 0, { "$anInt should be < 0" })
+  }
+  ```
+
 - You can use all of Kotlin's array and collection types (and have them generated for you).
 
 - You can use Kotlin function types instead of Java's lambdas and `@Functional` types.
