@@ -14,7 +14,7 @@ Some of the few articles and resources I found are
 - [A short blog series](https://medium.com/default-to-open/property-based-testing-in-kotlin-part-1-56929927b8b8)
 - [A chapter of "The Joy of Kotlin"](https://livebook.manning.com/book/the-joy-of-kotlin/b-property-based-testing-in-kotlin/v-8/156)
 
-This article wants to fill the gap a little bit. 
+__This article__ wants to fill the gap a little bit. 
 It covers the application of PBT in Kotlin using 
 [jqwik](https://jqwik.net) and [jqwik's Kotlin module](https://jqwik.net/docs/snapshot/user-guide.html#kotlin-module).
 
@@ -24,8 +24,8 @@ It covers the application of PBT in Kotlin using
 ## Table of Contents  
 
 - [A Short Intro to PBT](#a-short-intro-to-pbt)
-- [Jqwik and the JUnit Platform](#jqwik-and-the-junit-platform)
-- [Setting Up Jqwik for Kotlin](#setting-up-jqwik-for-kotlin)
+- [jqwik and the JUnit Platform](#jqwik-and-the-junit-platform)
+- [Setting Up jqwik for Kotlin](#setting-up-jqwik-for-kotlin)
 - [Success, Failure and Shrinking](#success-failure-and-shrinking)
 - [Generators (aka Arbitraries)](#generators-aka-arbitraries)
   - [Configuration through Annotation](#configuration-through-annotation)
@@ -61,8 +61,8 @@ It covers the application of PBT in Kotlin using
   - [Constraints and Quirks](#constraints-and-quirks)
 - [Kotest - An Alternative to jqwik](#kotest---an-alternative-to-jqwik)
 - [Summary](#summary)
-  - [Feedback](#feedback)
-  - [Sharing, Code and License](#sharing-code-and-license)
+- [Feedback](#feedback)
+- [Sharing, Code and License](#sharing-code-and-license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -125,7 +125,7 @@ Here are two articles to get you started, one of them from myself:
 - [Know for Sure](https://blogs.oracle.com/javamagazine/post/know-for-sure-with-property-based-testing)
 
 
-## Jqwik and the JUnit Platform
+## jqwik and the JUnit Platform
 
 As you have seen above _jqwik_ follows JUnit's lead in using an annotation (`@Property`) 
 to mark a plain function as an executable property. 
@@ -165,7 +165,7 @@ If you want to learn more about how test engines work
 [this series of articles](https://blogs.oracle.com/javamagazine/post/junit-build-custom-test-engines-java) 
 may interest you.
 
-## Setting Up Jqwik for Kotlin
+## Setting Up jqwik for Kotlin
 
 Despite its original focus on Java, jqwik has worked well with Kotlin for a long time.
 As of version `1.6.0` there's an additional Kotlin module which makes the experience even smoother.
@@ -1390,7 +1390,7 @@ class KotestExamples : StringSpec({
 })
 ```
 
-What we can see is that Kotest container classes have there test specifications in the constructor.
+What we can see is that Kotest container classes have their test specifications in the constructor.
 Moreover, there is the possibility to define generators by target type 
 or by choosing them through functions on class `io.kotest.property.Arb`.
 
@@ -1409,13 +1409,13 @@ Generating domain-specific objects is as important as coming up with good proper
 jqwik, which originally is a Java library, now comes with a Kotlin module 
 to make its use with Kotlin smooth and comfortable.
 
-### Feedback
+## Feedback
 
 Give feedback, ask questions and tell me about your own PBT experiences
 on [Twitter](https://twitter.com/johanneslink).
 
 
-### Sharing, Code and License
+## Sharing, Code and License
 
 This article is published under the following license:
 [Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/)
