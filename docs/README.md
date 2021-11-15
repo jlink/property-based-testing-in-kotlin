@@ -69,7 +69,7 @@ It covers the application of PBT in Kotlin using
 ## A Short Intro to PBT
 
 You all know example-based tests, at least I hope you do. 
-This is prototypical example test using [JUnit Jupiter](https://junit.org/junit5/docs/current/user-guide/):
+This is a typical example test using [JUnit Jupiter](https://junit.org/junit5/docs/current/user-guide/):
 
 ```kotlin
 @Test
@@ -79,9 +79,9 @@ fun `any list with elements can be reversed`() {
 }
 ```
 
-One of the problems with example-based tests: They typically promise more than they can keep.
-They usually cover only a few examples, but they would like to make sure 
-that the code works for _all valid input_.
+One of the problems with example-based tests: They often promise more than they can keep.
+Although they typically cover only a few examples, 
+they would rather like to make sure that the code works for _all valid input_.
 
 Property-based tests, however, focus on common _properties_ (hence the name) of the code under test.
 While it's not straightforward to predict the outcome of an arbitrary list's reversal without re-implementing reverse in your test,
