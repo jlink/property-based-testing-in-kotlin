@@ -317,13 +317,14 @@ You have already seen a few of those annotations:
 - `@NotBlank` tells String generators to never generate blank Strings (empty or whitespace only).
 - `@Email` to use an email-specifc String generator instead of the default one.
 
-There's many of them; and their number is constantly growing.
-They are described in the user guide's chapter on [Constraining Default Generation](https://jqwik.net/docs/current/user-guide.html#constraining-default-generation)
-and in the chapters for optional modules like 
+There are many more; and their number is constantly growing.
+You can read about them in the user guide's chapter on 
+[Constraining Default Generation](https://jqwik.net/docs/current/user-guide.html#constraining-default-generation)
+and in the chapters about optional modules like 
 [web](https://jqwik.net/docs/current/user-guide.html#web-module) and 
 [time](https://jqwik.net/docs/current/user-guide.html#time-module).
 
-Eventually you will have to concede, though, that the writers of jqwik will never be able 
+Eventually you will have to concede, though, that the maintainers of jqwik will never be able 
 to fulfill all your domain-specific needs.
 Therefore, there must be a way to build generators of your own liking with _programming_,
 as opposed to just _specifying_ them through types and annotations.
@@ -337,17 +338,17 @@ To "program" a domain-specific generator the procedure is usually as follows:
 - Map, filter and combine the base generators into building instances of your domain type.
 - Use your domain type generators for composing more complex domain generators if necessary.
 
-Although they are often called "generators", in jqwik they are represented by the interface `Arbitrary<T>`,
+Although they are often called "generators", in jqwik the generator abstraction is represented by the interface `Arbitrary<T>`,
 where `T` is the type of the values to generate.
 Think of `Arbitrary<T>` as a shorthand for _factory of generators for arbitrary objects of type T_.
 This abstraction comes with a lot of useful features to transform and combine it; 
-functional programmers may even call it _monadic_.
+functional programmers may even call it [_monadic_](https://en.wikipedia.org/wiki/Monad_(functional_programming)).
 
 Let's look at how to build an arbitrary for the `Player` type, 
 which is supposed to represent participants of a card game:
 
 ```kotlin
-data class Player(val nickname: String, val ranking: Int, val postion: String)
+data class Player(val nickname: String, val ranking: Int, val position: String)
 ```
 
 I've chosen to use a data class here to make the code compact, 
