@@ -1,11 +1,10 @@
 # Property-based Testing in Kotlin
 
-#### Last Update: November 12, 2021
-
-##### _This is work in progress. Please provide feedback on [Twitter](https://twitter.com/johanneslink)_
+#### Last Update: November 25, 2021
 
 Kotlin is currently the most hyped language on the JVM. With good reason.
-Kotlin is mostly compatible with Java and comes with a nice set of features 
+Most parts of Kotlin are fully compatible with Java. 
+Moreover, the language comes with a nice set of features 
 to make programming on the JVM less burdensome and more functional.
 
 However, there is not much coverage of _Property-based Testing_ (PBT) focusing on Kotlin.
@@ -16,7 +15,7 @@ Some of the few articles and resources I found are
 
 __This article__ wants to fill the gap a little bit. 
 It covers the application of PBT in Kotlin using 
-[jqwik](https://jqwik.net) and [jqwik's Kotlin module](https://jqwik.net/docs/snapshot/user-guide.html#kotlin-module).
+[jqwik](https://jqwik.net) and [jqwik's Kotlin module](https://jqwik.net/docs/current/user-guide.html#kotlin-module).
 
 <!-- Generated toc must be stripped of `nbsp` occurrences in links -->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -1241,7 +1240,7 @@ Here's a selection:
   which requires backticks because `in` is a Kotlin keyword.
 
 You can find a comprehensive documentation of convenience functions in  
-[this section](https://jqwik.net/docs/snapshot/user-guide.html#convenience-functions-for-kotlin)
+[this section](https://jqwik.net/docs/current/user-guide.html#convenience-functions-for-kotlin)
 of jqwik's user guide.
 
 
