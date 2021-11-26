@@ -1138,7 +1138,31 @@ That means that:
 
 - You can use the different Kotlin ways to define types (data classes, sealed classes, type aliases etc.)
   as target types for generation or as test containers where it makes sense.
-  As a special trick you can use singleton objects as container classes:
+
+  Data classes lend themselves especially well for being used with `@UseType`,
+  because data class constructors are automatically being considered as generator functions.
+  Thus, the following example, which requires __jqwik 1.6.1__, shows how data classes
+  can be generated from just their type information.
+  It also shows that parameter annotations are considered - just like in property methods. 
+
+  ```kotlin
+  class UseTypeWithDataclassesExamples {
+
+    @Property(tries = 10)
+    fun generateCommunications(@ForAll @UseType communication: Communication) {
+        println(communication)
+    }
+  }
+
+  data class Person(val firstName: String, val lastName: String)
+
+  data class User(val identity: Person, @Email val email: String)
+
+  data class Communication(val from: User, val to: User)
+  ```
+  
+  
+- As a special trick you can use singleton objects as container classes:
 
   ```kotlin
   object MySingletonProperties {
