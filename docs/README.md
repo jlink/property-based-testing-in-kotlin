@@ -1154,7 +1154,7 @@ That means that:
     }
   }
 
-  data class Person(val firstName: String, val lastName: String)
+  data class Person(val firstName: String?, val @NotBlank lastName: String)
 
   data class User(val identity: Person, @Email val email: String)
 
