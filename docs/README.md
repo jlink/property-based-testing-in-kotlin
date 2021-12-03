@@ -1197,6 +1197,24 @@ That means that:
   }
   ```
 
+- One more thing: In Kotlin the context object (aka `this`) of a function can be enhanced.
+  This allows property methods to have their own context type:
+
+  ```kotlin
+   val key = "a number"
+
+   @Property
+   fun Reporter.reportGeneratedNumbers(@ForAll aNumber: Int) {
+       publishReport(key, aNumber) // This is a call to reporter.publishReport(..)
+   }
+  ```
+   
+  Since context objects are being translated to function parameters in Java bytecode,
+  the context of type [`Reporter`]() will automatically being injected,
+  if there is a registered [parameter resolver hook](https://jqwik.net/docs/current/user-guide.html#resolveparameterhook) 
+  for this type of parameter.
+  How cool is that?
+
 ### Nullability
 
 Kotlin's default to not allow `null` values for plain types is one of its strong arguments.
