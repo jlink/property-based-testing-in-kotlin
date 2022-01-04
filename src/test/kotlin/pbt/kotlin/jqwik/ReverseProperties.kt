@@ -9,6 +9,10 @@ import org.assertj.core.api.Assertions.assertThat
 class ReverseProperties {
 
     @Property
+    fun `the size remains the same`(@ForAll list: List<Int>) =
+        list.size == list.reversed().size
+
+    @Property
     fun `reversing keeps all elements`(@ForAll list: List<Int>) {
         assertThat(list.reversed()).containsAll(list)
     }
