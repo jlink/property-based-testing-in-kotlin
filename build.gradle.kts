@@ -7,24 +7,24 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") version "1.6.0"
+    kotlin("jvm") version "1.6.10"
 }
-
-group = "pbt.kotlin"
-version = "0.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
+    maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    testImplementation("net.jqwik:jqwik:1.6.1")
-    testImplementation("net.jqwik:jqwik-kotlin:1.6.1")
+    testImplementation("net.jqwik:jqwik:1.6.3-SNAPSHOT")
+    testImplementation("net.jqwik:jqwik-kotlin:1.6.3-SNAPSHOT")
     testImplementation("org.assertj:assertj-core:3.21.0")
-    testImplementation("io.kotest:kotest-runner-junit5:4.6.3")
-    testImplementation("io.kotest:kotest-property-jvm:4.6.3")
+    testImplementation("io.kotest:kotest-runner-junit5:5.0.2")
+    testImplementation("io.kotest:kotest-property-jvm:5.0.2")
+
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
 }
 
 tasks.withType<Test> {
@@ -49,5 +49,5 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "7.2"
+    gradleVersion = "7.3.2"
 }
