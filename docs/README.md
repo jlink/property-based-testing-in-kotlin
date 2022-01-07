@@ -1,6 +1,6 @@
 # Property-based Testing in Kotlin
 
-#### Last Update: November 25, 2021
+#### Last Update: January 7, 2022
 
 Kotlin is currently the most hyped language on the JVM. With good reason.
 Most parts of Kotlin are fully compatible with Java. 
@@ -150,7 +150,7 @@ fun `can add up to 10 team members to a project`(
         project.addMember(user)
     }
     for (user in users) {
-        project.isMember(user)
+        assertThat(project.isMember(user)).isTrue
     }
 }
 ```
