@@ -8,9 +8,8 @@ import org.assertj.core.api.Assertions.assertThat
 class MyStackProperties {
 
     @Property
-    fun `check my string stack`(@ForAll("sequences") sequence: ActionSequence<MyStack>) {
+    fun `check my stack`(@ForAll("sequences") sequence: ActionSequence<MyStack>) =
         sequence.run(MyStack())
-    }
 
     @Provide
     fun sequences() = Arbitraries.sequences(MyStackActions.actions())

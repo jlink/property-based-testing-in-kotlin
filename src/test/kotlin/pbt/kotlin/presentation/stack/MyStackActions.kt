@@ -2,65 +2,53 @@ package pbt.kotlin.presentation.stack
 
 import net.jqwik.api.Arbitraries.just
 import net.jqwik.api.Arbitraries.oneOf
-import net.jqwik.api.Arbitrary
 import net.jqwik.api.stateful.Action
 import net.jqwik.kotlin.api.any
 import org.assertj.core.api.Assertions.assertThat
-import java.io.Serializable
 
 object MyStackActions {
 
-    fun actions(): Arbitrary<Action<MyStack>> {
-        return oneOf(push(), clear(), pop())
-    }
+    fun actions() = oneOf(push(), clear(), pop())
 
-    fun push(): Arbitrary<Action<MyStack>> {
-        return String.any().alpha().ofLength(5).map { PushAction(it) }
-    }
+    fun push() = String.any().alpha().ofLength(5).map { PushAction(it) }
 
-    private fun clear(): Arbitrary<Action<MyStack>> {
-        return just(ClearAction())
-    }
+    private fun clear() = just(ClearAction())
 
-    private fun pop(): Arbitrary<Action<MyStack>> {
-        return just(PopAction())
-    }
+    private fun pop() = just(PopAction())
 
-    private class PushAction constructor(private val element: String) : Action<MyStack>, Serializable {
-        override fun run(model: MyStack): MyStack {
-            val sizeBefore: Int = model.size
-            model.push(element)
-            assertThat(model.isEmpty).isFalse
-            assertThat(model.size).isEqualTo(sizeBefore + 1)
-            assertThat(model.top).isEqualTo(element)
-            return model
+    class PushAction constructor(private val element: String) : Action<MyStack> {
+        override fun run(state: MyStack): MyStack {
+            val sizeBefore: Int = state.size
+            state.push(element)
+            assertThat(state.isEmpty).isFalse
+            assertThat(state.size).isEqualTo(sizeBefore + 1)
+            assertThat(state.top).isEqualTo(element)
+            return state
         }
 
         override fun toString() = "push($element)"
     }
 
-    private class ClearAction : Action<MyStack>, Serializable {
-        override fun run(model: MyStack): MyStack {
-            model.clear()
-            assertThat(model.isEmpty).isTrue
-            return model
+    class ClearAction : Action<MyStack> {
+        override fun run(state: MyStack): MyStack {
+            state.clear()
+            assertThat(state.isEmpty).isTrue
+            return state
         }
 
         override fun toString() = "clear"
     }
 
-    private class PopAction : Action<MyStack>, Serializable {
-        override fun precondition(model: MyStack): Boolean {
-            return !model.isEmpty
-        }
+    class PopAction : Action<MyStack> {
+        override fun precondition(state: MyStack) = !state.isEmpty
 
-        override fun run(model: MyStack): MyStack {
-            val sizeBefore: Int = model.size
-            val topBefore: String = model.top
-            val popped = model.pop()
+        override fun run(state: MyStack): MyStack {
+            val sizeBefore: Int = state.size
+            val topBefore: String = state.top
+            val popped = state.pop()
             assertThat(popped).isEqualTo(topBefore)
-            assertThat(model.size).isEqualTo(sizeBefore - 1)
-            return model
+            assertThat(state.size).isEqualTo(sizeBefore - 1)
+            return state
         }
 
         override fun toString() = "pop"

@@ -4,7 +4,7 @@ class MyStack {
 
     private val elements: MutableList<String> = mutableListOf()
 
-    fun push(element: String) {
+    fun push(element: String): Unit {
         elements.add(0, element)
     }
 
@@ -12,7 +12,7 @@ class MyStack {
         return elements.removeAt(0)
     }
 
-    fun clear() {
+    fun clear(): Unit {
         //Uncomment to see property fail:
         //if (elements.size < 3)
         elements.clear()
