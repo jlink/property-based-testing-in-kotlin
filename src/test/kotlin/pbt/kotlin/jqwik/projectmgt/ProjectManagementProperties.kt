@@ -7,6 +7,7 @@ import net.jqwik.api.constraints.Size
 import net.jqwik.api.constraints.UniqueElements
 import net.jqwik.web.api.Email
 import net.jqwik.web.api.Web
+import org.assertj.core.api.Assertions.assertThat
 
 class ProjectManagementProperties {
 
@@ -21,7 +22,7 @@ class ProjectManagementProperties {
             project.addMember(user)
         }
         for (user in users) {
-            project.isMember(user)
+            assertThat(project.isMember(user)).isTrue
         }
     }
 
@@ -33,13 +34,11 @@ class ProjectManagementProperties {
             project.addMember(user)
         }
         for (user in users) {
-            project.isMember(user)
+            assertThat(project.isMember(user)).isTrue
         }
     }
 
     @Provide
-    fun members(): Arbitrary<List<User>> {
-        return Web.emails().map { User(it) }.list().ofMaxSize(50).uniqueElements()
-    }
+    fun members() = Web.emails().map { User(it) }.list().ofMaxSize(50).uniqueElements()
 
 }
