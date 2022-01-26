@@ -5,9 +5,11 @@ class User(email: String) {
 
     init {
         assertValidEmail(email)
-        // This is actually a bug because local part of email address might be case sensitive
-        //this.email = email.lowercase()
-        this.email = email
+
+        // This is actually a bug because local part of an email address might be case-sensitive:
+        this.email = email.lowercase()
+
+        // this.email = email
     }
 
     private fun assertValidEmail(email: String) {

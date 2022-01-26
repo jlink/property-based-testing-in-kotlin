@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 
 class ProjectManagementProperties {
 
+    // This property sometimes detects a bug in User.kt
     @Property(tries = 100)
     fun `can add up to 10 team members to a project`(
         @ForAll projectName: @NotBlank @NumericChars String,
