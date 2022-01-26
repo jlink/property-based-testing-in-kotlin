@@ -15,8 +15,9 @@ class Project @JvmOverloads constructor(name: String, membersLimit: Int = 10) {
         require(!emailKnown(newMember.email)) {
             "Member with email [${newMember.email}] already exists."
         }
-        require(members.size < membersLimit) {
-            "Maximum number of $membersLimit members already reached"
+        if(members.size >= membersLimit) {
+            val message = "Maximum number of $membersLimit members already reached"
+            throw RuntimeException(message)
         }
         members.add(newMember)
     }
