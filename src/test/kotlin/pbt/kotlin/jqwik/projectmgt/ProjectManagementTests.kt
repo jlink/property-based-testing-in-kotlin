@@ -3,7 +3,7 @@ package pbt.kotlin.jqwik.projectmgt
 import net.jqwik.api.Example
 import org.assertj.core.api.Assertions.assertThat
 
-class ProjectManagementExamples {
+class ProjectManagementTests {
 
     @Example
     fun `you can add many team members`() {

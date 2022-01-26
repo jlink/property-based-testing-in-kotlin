@@ -20,8 +20,8 @@ dependencies {
     testImplementation("net.jqwik:jqwik:1.6.3")
     testImplementation("net.jqwik:jqwik-kotlin:1.6.3")
     testImplementation("org.assertj:assertj-core:3.22.0")
-    testImplementation("io.kotest:kotest-runner-junit5:5.0.3")
-    testImplementation("io.kotest:kotest-property-jvm:5.0.3")
+    testImplementation("io.kotest:kotest-runner-junit5:5.1.0")
+    testImplementation("io.kotest:kotest-property-jvm:5.1.0")
 
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
@@ -49,5 +49,5 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "7.3.2"
+    gradleVersion = "7.3.3"
 }
