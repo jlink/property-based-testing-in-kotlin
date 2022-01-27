@@ -17,8 +17,8 @@ repositories {
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    testImplementation("net.jqwik:jqwik:1.6.3")
-    testImplementation("net.jqwik:jqwik-kotlin:1.6.3")
+    testImplementation("net.jqwik:jqwik:1.6.4-SNAPSHOT")
+    testImplementation("net.jqwik:jqwik-kotlin:1.6.4-SNAPSHOT")
     testImplementation("org.assertj:assertj-core:3.22.0")
     testImplementation("io.kotest:kotest-runner-junit5:5.1.0")
     testImplementation("io.kotest:kotest-property-jvm:5.1.0")
