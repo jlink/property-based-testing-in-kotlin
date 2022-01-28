@@ -1,6 +1,6 @@
 package pbt.kotlin.jqwik.projectmgt
 
-class Project @JvmOverloads constructor(name: String, membersLimit: Int = 10) {
+class Project constructor(name: String, membersLimit: Int = 10) {
     val name: String
     private val membersLimit: Int
     private val members: MutableSet<User> = HashSet()
@@ -12,14 +12,15 @@ class Project @JvmOverloads constructor(name: String, membersLimit: Int = 10) {
     }
 
     fun addMember(newMember: User) {
-        requireUnknownEmail(newMember)
         requireCapacityNotReached()
+        requireUnknownEmail(newMember)
         members.add(newMember)
     }
 
     private fun requireCapacityNotReached() {
-        require(members.size < membersLimit) {
-            "Maximum number of $membersLimit members already reached"
+        if (members.size >= membersLimit) {
+            val message = "Maximum number of $membersLimit members already reached"
+            throw RuntimeException(message)
         }
     }
 
