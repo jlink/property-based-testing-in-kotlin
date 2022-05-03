@@ -7,7 +7,7 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.20"
 }
 
 repositories {
@@ -17,8 +17,8 @@ repositories {
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    testImplementation("net.jqwik:jqwik:1.6.4")
-    testImplementation("net.jqwik:jqwik-kotlin:1.6.4")
+    testImplementation("net.jqwik:jqwik:1.6.5")
+    testImplementation("net.jqwik:jqwik-kotlin:1.6.5")
     testImplementation("org.assertj:assertj-core:3.22.0")
     testImplementation("io.kotest:kotest-runner-junit5:5.1.0")
     testImplementation("io.kotest:kotest-property-jvm:5.1.0")
