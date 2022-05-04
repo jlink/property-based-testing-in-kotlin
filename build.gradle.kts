@@ -43,7 +43,7 @@ tasks.withType<KotlinCompile> {
 			"-Xjsr305=strict", // Required for strict interpretation of
 			"-Xemit-jvm-type-annotations" // Required for annotations on type variables
 		)
-        jvmTarget = "16" // 1.8 or above
+        jvmTarget = "17" // 1.8 or above
         javaParameters = true // Required to get correct parameter names in reporting
     }
 }
