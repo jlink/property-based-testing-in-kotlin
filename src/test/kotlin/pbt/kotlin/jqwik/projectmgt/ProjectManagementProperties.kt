@@ -28,7 +28,7 @@ class ProjectManagementProperties {
     }
 
     @Property(tries = 100)
-    fun `can add team members up to specified limit`(@ForAll("members") users: List<User>) {
+    fun `can add team members up to specified limit`(@ForAll("members") users: @Size(max = 50) List<User>) {
         val limit = users.size
         val project = Project("projectName", limit)
         for (user in users) {
@@ -40,6 +40,6 @@ class ProjectManagementProperties {
     }
 
     @Provide
-    fun members() = Web.emails().map { User(it) }.list().ofMaxSize(50).uniqueElements()
+    fun members() = Web.emails().map { User(it) }.list().uniqueElements()
 
 }
