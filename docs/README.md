@@ -1,6 +1,6 @@
 # Property-based Testing in Kotlin
 
-#### Last Update: January 7, 2022
+#### Last Update: May 10, 2022
 
 Kotlin is currently the most hyped language on the JVM. With good reason.
 Most parts of Kotlin are fully compatible with Java. 
@@ -80,7 +80,7 @@ fun `any list with elements can be reversed`() {
 
 One of the problems with example-based tests: They often promise more than they can keep.
 Although they typically cover only a few examples, 
-they would rather like to make sure that the code works for _all valid input_.
+they would rather be able to ensure that the code works for _all valid input_.
 
 Property-based tests, however, focus on common _properties_ (hence the name) of the code under test.
 While it's not straightforward to predict the outcome of an arbitrary list's reversal without re-implementing reverse in your test,
@@ -113,7 +113,7 @@ fun `reversing swaps first and last`(@ForAll @Size(min=2) list: List<Int>) {
 
 When you run these tests through your IDE or Maven or Gradle, 
 each function will be executed 1000 times.
-Each execution will be different, though, since jqwik will generate a new list for each _try_.
+Each execution will be different, though, since jqwik generates a new list for each _try_ (a single execution of the property method).
 You will see later, how succeeding and failing property runs are reported.
 
 To be frank, the _Reverse List_ example is notorious and also rather boring. 
@@ -172,7 +172,7 @@ As of version `1.6.0` there's an additional Kotlin module which makes the experi
 If you're already using JUnit 5, the set up for jqwik is really easy: 
 Just add a dependency to `jqwik.net:jqwik-kotlin:<version>`. 
 In practice, I recommend adding a few compiler options to make your life easier.
-Here's how you can do that in a Gradle Kotlin-based build file:
+Here's how you can do that in a Gradle build file using the Kotlin syntax:
 
 ```
 tasks.withType<KotlinCompile> {
@@ -181,7 +181,7 @@ tasks.withType<KotlinCompile> {
 		  "-Xjsr305=strict", // Strict interpretation of nullability annotations in jqwik API
 		  "-Xemit-jvm-type-annotations" // Enable nnotations on type variables
 		)
-        jvmTarget = "16" // 1.8 or above
+        jvmTarget = "17" // 1.8 or above
         javaParameters = true // Get correct parameter names in jqwik reporting
     }
 }
@@ -195,7 +195,7 @@ for fully configured examples for Gradle and Maven.
 
 ## Success, Failure and Shrinking
 
-Now that you can run your own properties it's worthwhile to look at jqwik reporting. 
+Now that you can run your own properties it's worthwhile to look at jqwik's reporting capabilities. 
 When we run this property from above:
 
 ```kotlin
@@ -221,7 +221,7 @@ edge-cases#tried = 10         | # of edge cases tried in current run
 seed = -8839434152225186972   | random seed to reproduce generated values
 ```
 
-With default [configuration](https://jqwik.net/docs/current/user-guide.html#jqwik-configuration) 
+With the default [configuration](https://jqwik.net/docs/current/user-guide.html#jqwik-configuration) 
 this report will be published for each and every property.
 It tells you how often a property function has been started (`tries`), 
 how often it has actually been evaluated (`checks`),
@@ -229,8 +229,8 @@ the random `seed` that can be used for replicating the exact same generated test
 and other information of lesser importance.
 
 Let's see what happens when a property run fails.
-The following property suggests that `list.reversed()` does nothing - 
-which is, of course, wrong:
+The following property suggests that `list.reversed()` does not change the list at hand - 
+which is, of course, wrong and leads to a failing property run:
 
 ```kotlin
 @Property
@@ -271,10 +271,10 @@ Original Sample
 ```
 
 In addition to the `AssertionFailedError` two sets of data are being shown:
-the _original sample_ and the _shrunk sample_.
+the _shrunk sample_ and the _original sample_.
 Both show data that make the property fail. 
-Whereas the former is (pseudo-)randomly generated, the latter is the result of _shrinking_ the original set of values.
-_Shrinking_ is PBT lingo for taking the original failing sample, making it somewhat "smaller" 
+Whereas the latter is (pseudo-)randomly generated, the _shrunk sample_ is the result of _shrinking_ the original set of values.
+_Shrinking_ is PBT lingo for taking the original failing sample, making it "smaller" in relation to an internal size metric, 
 and re-running the property function with this simplified version.
 This _shrinking phase_ continues until no smaller sample can be found.
 
@@ -300,6 +300,8 @@ with some tweaking possible.
 It also comes with fully integrated shrinking.
 For the user of a library that's the all-round carefree package, 
 if it works as expected, which it usually does.
+If you're interested in seeing the different shrinking performance of PBT libs in comparison have a look at 
+[The Shrinking Challenge](https://github.com/jlink/shrinking-challenge).
 
 
 ## Generators (aka Arbitraries)
@@ -313,6 +315,7 @@ The simplest way to influence what your generators produce is by using specific 
 the purpose of which is to provide information about constraints.
 You have already seen a few of those annotations:
 - `@Size` can constraining the size of multi-value types like `List`, `Set`, arrays and others.
+- `@StringLength` does what the name says.
 - `@NotBlank` tells String generators to never generate blank Strings (empty or whitespace only).
 - `@Email` to use an email-specifc String generator instead of the default one.
 
@@ -323,7 +326,7 @@ and in the chapters about optional modules like
 [web](https://jqwik.net/docs/current/user-guide.html#web-module) and 
 [time](https://jqwik.net/docs/current/user-guide.html#time-module).
 
-Eventually you will have to concede, though, that the maintainers of jqwik will never be able 
+Eventually you will have to admit, though, that the maintainers of jqwik will never be able 
 to fulfill all your domain-specific needs.
 Therefore, there must be a way to build generators of your own liking with _programming_,
 as opposed to just _specifying_ them through types and annotations.
@@ -540,7 +543,7 @@ public interface Arbitrary<T> {
 
 #### Filtering
 
-Filtering is about including values that fulfill a predicate.
+Filtering is about including values that fulfill a condition.
 Use the following snippet for generating only even numbers between 2 and 100000:
 
 ```kotlin
@@ -566,8 +569,8 @@ Int.any(1..Int.MAX_VALUE).map { it.toString(16) }
 ### Creating Collections and other Multi-Value Types
 
 Lists, sets, arrays etc. are very common when it comes to building domain specific data types.
-Therefore, it should be easy to generate those as well; and it is.
-Just use `list()`, `set()`, `stream()`, `iterator()` and `array(..)`:
+Therefore, it should be easy to generate those as well - and it is:
+Just use `list()`, `set()`, `stream()`, `iterator()` or `array(..)`.
 
 Here's how you build a generator for lists of 10 doubles:
 
@@ -643,7 +646,7 @@ fun `index works for element in list`(@ForAll("listWithValidIndex") listWithInde
 @Provide
 fun listWithValidIndex() : Arbitrary<Pair<List<Int>, Int>> {
     val lists = Int.any().list().ofMinSize(1)
-    return lists.flatMap { list -> Int.any(0 until list.size).map { index -> Pair(list, index)} }
+    return lists.flatMap { list -> Int.any(0 until list.size).map { index -> Pair(list, index) } }
 }
 ```
 
@@ -795,7 +798,7 @@ This is convenient, since it allows us to have the specification of generated da
 close to the property function itself.
 
 One thing with this approach is difficult, though: 
-Sharing generators across container classes is not easily possible.
+Sharing generators across container classes is not straightforward.
 You _could_ move common generation logic into a helper class 
 and then delegate to this class from provider functions.
 Provider functions _must_ reside in the class of the property function, or in a supertype, 
@@ -908,8 +911,8 @@ class PokerProperties {
 These verify that the generators work as expected.
 The first one does the verification by collecting statistical values about
 the frequency of cards being generated.
-You might expect that a 1000 tries will result in a more or less equal distribution of the 52 cards.
-But something else is happening here, as we seen when looking at the report:
+You might expect that 1000 tries will result in a more or less equal distribution of the 52 cards.
+But something else is happening here, as we notice when looking at the report:
 
 ```
 [PokerProperties:all 52 possible cards are generated] (52) statistics = 
@@ -985,7 +988,7 @@ and `DomainContextBase`.
 Last but not least, there is one more way to provide an arbitrary for a given type:
 You can register a global `ArbitraryProvider` implementation.
 If you would like, for example, to generate a `PlayingCard` whenever this type is referenced 
-in any a for-all parameter, in any property function in your tests, 
+in a for-all parameter, in any property function in your tests, 
 all you need is this class:
 
 ```kotlin
@@ -1029,7 +1032,7 @@ Here's my personal list of strategies to choose from:
 
 It's beyond the scope of this article to cover these to any useful degree of detail.
 That's why I'll provide you with a few pointers further down.
-One category, however, is so different from how we are used to think about example-based tests
+One category, however, is so different from how we are used to thinking about example-based tests
 that I want to at least scratch its surface: _Metamorphic Properties_.
 
 ### Metamorphic Properties
@@ -1058,7 +1061,7 @@ fun `sum is enhanced by X`(@ForAll list: IntArray, @ForAll x: Int) : Boolean {
 }
 ```
 
-The basic idea behind metamorphic properties is behind some of the better known patters
+The basic idea behind metamorphic properties is behind some of the better known patterns
 like "inverse operations", "idempotence" and "commutativity", 
 all of which are described in the articles listed below.
 
@@ -1141,9 +1144,9 @@ That means that:
 
   Data classes lend themselves especially well for being used with `@UseType`,
   because data class constructors are automatically being considered as generator functions.
-  Thus, the following example, which requires __jqwik 1.6.1__, shows how data classes
+  Thus, the following example, which requires __jqwik 1.6.1__ or above, shows how data classes
   can be generated from just their type information.
-  It also shows that parameter annotations are considered - just like in property methods. 
+  It also shows that parameter annotations are taken into consideration - just like in property methods. 
 
   ```kotlin
   class UseTypeWithDataclassesExamples {
@@ -1174,7 +1177,7 @@ That means that:
   }
   ```
   
-  In this case the lifecycle changes in so far that all invocations of property methods
+  In this case the lifecycle changes in so far as all invocations of property methods
   will share them same singleton instance as `this` reference, 
   which is similar to Jupiter's `TestInstance.Lifecycle.PER_CLASS`.
   Sadly, IntelliJ does not recognize Kotlin's `object` definitions as test container classes
@@ -1217,7 +1220,7 @@ That means that:
 
 ### Nullability
 
-Kotlin's default to not allow `null` values for plain types is one of its strong arguments.
+Kotlin's default to not allow `null` values for plain types is one of its strong sides.
 This goes well together with jqwik's strategy to never generate `null` unless explicitly told to do so.
 Wouldn't it be nice if jqwik used Kotlin's nullability information, e.g. `String?`, 
 to inject `null`s into generated values if and only if the type specifies it?
@@ -1247,14 +1250,14 @@ fun `generate nulls in list`(@ForAll list: List<@WithNull String?>) {
 
 ### Convenience Methods
 
-Using the Java API can be quite involved from Kotlin.
+Using the Java API from Kotlin can feel rather awkward and involved.
 That's why `jqwik-kotlin` comes with quite a few convenience functions.
 Here's a selection:
 
 - Instead of `Arbitraries.strings()`, `Arbitraries.integers()` etc. you can use
   a shorthand `String.any()`, `Int.any()` and so on.
 
-- `Arbitrary.orNull(probability: Double) : T?` can replace `Arbitrary.injectNull(probabilit)`
+- `Arbitrary.orNull(probability: Double) : T?` can replace `Arbitrary.injectNull(probability)`
   and returns a nullable type.
 
 - `Arbitrary.array<T, A>()` can replace `Arbitrary.array(javaClass: Class<A>)`.
