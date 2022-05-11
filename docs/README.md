@@ -1343,7 +1343,7 @@ you are invited to [create an issue](https://github.com/jlink/jqwik/issues/new?t
 
 Another strong side of Kotlin is its support for 
 [asynchronous, non-blocking code and co-routines](https://kotlinlang.org/docs/coroutines-overview.html).
-In order to test suspending functions or coroutines the Kotlin module offers two options:
+In order to test suspending functions or coroutines the jqwik's Kotlin module offers two options:
 
 - Use the global function `runBlockingProperty(..)`.
 
@@ -1373,7 +1373,7 @@ suspend fun `use suspend function`(@ForAll s: String) {
 }
 ```
 
-Both variants just start the body of the property method asynchronously and wait for all coroutines to finish.
+Both variants start the body of the property method asynchronously and wait for all coroutines to finish.
 That means that delays will require the full amount of specified delay time and context switching,
 which may push you towards a smaller number of tries if a property's execution time gets too high.
 
@@ -1389,10 +1389,11 @@ Some things are not as smooth (yet) as I'd like them to be.
 For example: Kotlin's unsigned integer types, as well as inline classes, 
 do not show up on Java's byte code side _at all_. 
 That means they are treated naively;
-`UInt` as `Int` and so on, an inlined class as the type it is inlining.
-This means that you cannot write generators for these types, only for their Java counterpart.
+`UInt` as `Int` and an inlined class as the type it is inlining.
+This also means that you cannot write generators for these types, only for their Java counterpart.
 
-Kotlin's support for injecting the correct annotations in the byte code is not perfect yet.
+Kotlin's support for injecting the correct annotations in the byte code is not perfect yet - 
+but improving with each version.
 If you notice that a constraint annotation is sometimes not honoured by the generator,
 this might be an open Kotlin bug.
 
@@ -1400,7 +1401,7 @@ this might be an open Kotlin bug.
 
 jqwik's Kotlin support has one big disadvantage: It's not fully multi-platform.
 Since jqwik makes heavy use of Java's reflection mechanisms, it's bound to the JVM and Android platforms.
-Thus it's worthwhile to have a short look at a really platform-independent contender: 
+Thus, it's worthwhile to have a short look at a really platform-independent contender: 
 [Kotest](https://kotest.io/docs/proptest/property-based-testing.html) 
 
 Unlike jqwik (or JUnit) Kotest does not use annotations to mark test and property functions.
@@ -1439,20 +1440,22 @@ What we can see is that Kotest container classes have their test specifications 
 Moreover, there is the possibility to define generators by target type 
 or by choosing them through functions on class `io.kotest.property.Arb`.
 
-As of today (November 2021) Kotest's PBT feature set is much smaller than jqwik's.
-Moreover, given the fundamental different approach of style-based super classes,
-running individual tests and test classes in your IDE is not as straightforward as with jqwik.
+As of today (May 2022) Kotest's PBT feature set is considerably smaller than jqwik's.
+Things that stand out here are: assumptions, state-based testing, recursive generators, edge cases, 
+statistics and more effective shrinking.
+If you are interested in the differences between the two
+[Christoph's article](https://www.welcz.de/blog/2022/05/09/jqwik-at-first-glance-from-a-kotest-users-perspective/)
+about his first steps with jqwik after using kotest for a while is a must-read.
 
-Kotest can be a good choice for starting with PBT when you're using it already,
+Nevertheless, Kotest can be a good choice for getting into PBT when you're using it already,
 or when you need a truly multi-platform library.
 
 ## Summary
 
-Property-based testing is a cool tool to enhance and partially replace example-based testing.
+Property-based testing is a valuable tool to enhance and partially replace example-based testing.
 Generating domain-specific objects is as important as coming up with good properties to check.
 
-jqwik, which originally is a Java library, now comes with a Kotlin module 
-to make its use with Kotlin smooth and comfortable.
+jqwik, which originally is a Java library, comes with a Kotlin module to make its use with Kotlin smooth and comfortable.
 
 ## Feedback
 
