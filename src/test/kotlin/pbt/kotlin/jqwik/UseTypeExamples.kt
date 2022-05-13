@@ -7,7 +7,7 @@ import net.jqwik.api.constraints.NotBlank
 import net.jqwik.api.constraints.UseType
 import net.jqwik.web.api.Email
 
-class UseTypeWithDataclassesExamples {
+class UseTypeExamples {
 
     @Property(tries = 20)
     fun generateCommunications(@ForAll @UseType communication: Communication) {

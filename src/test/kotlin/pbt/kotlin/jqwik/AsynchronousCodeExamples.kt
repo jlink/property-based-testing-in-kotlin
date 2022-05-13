@@ -1,6 +1,8 @@
 package pbt.kotlin.jqwik
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.jqwik.api.ForAll
 import net.jqwik.api.Property
 import net.jqwik.kotlin.api.runBlockingProperty
@@ -31,4 +33,10 @@ class AsynchronousCodeExamples {
         assertThat(echo(s)).isEqualTo(s)
     }
 
+    @Property(tries = 10)
+    fun `use coroutines testing support`(@ForAll s: String) = runBlocking {
+        launch {
+            assertThat(echo(s)).isEqualTo(s)
+        }
+    }
 }
