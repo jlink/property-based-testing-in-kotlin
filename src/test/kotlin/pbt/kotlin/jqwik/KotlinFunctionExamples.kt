@@ -5,7 +5,7 @@ import net.jqwik.api.ForAll
 import net.jqwik.api.Property
 import net.jqwik.api.constraints.AlphaChars
 import net.jqwik.api.constraints.NotBlank
-import org.assertj.core.api.Assertions.assertThat
+import kotlin.test.assertIs
 
 class KotlinFunctionExamples {
 
@@ -16,7 +16,7 @@ class KotlinFunctionExamples {
         @ForAll int2: Int
     ) {
         Assume.that(int1 != int2)
-        assertThat(func(int1, int2)).isInstanceOf(String::class.java)
+        assertIs<Number>(func(int1, int2))
         println("f($int1, $int2) = ${func(int1, int2)}")
         println("f($int1, $int2) = ${func(int1, int2)}")
         println("f($int2, $int1) = ${func(int2, int1)}")

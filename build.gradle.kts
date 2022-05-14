@@ -21,9 +21,10 @@ dependencies {
     testImplementation("net.jqwik:jqwik:1.7.0-SNAPSHOT")
     testImplementation("net.jqwik:jqwik-kotlin:1.7.0-SNAPSHOT")
     testImplementation("org.assertj:assertj-core:3.22.0")
-    testImplementation("io.kotest:kotest-runner-junit5:5.2.3")
-    testImplementation("io.kotest:kotest-property-jvm:5.2.3")
+    testImplementation("io.kotest:kotest-runner-junit5:5.3.0")
+    testImplementation("io.kotest:kotest-property-jvm:5.3.0")
 
+    testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1")
 }
@@ -58,6 +59,7 @@ configure<com.bnorm.power.PowerAssertGradleExtension> {
         "kotlin.assert",
         "kotlin.require",
         "kotlin.check",
-        "kotlin.test.assertTrue"
+        "kotlin.test.assertTrue",
+        "kotlin.test.assertIs"
     )
 }

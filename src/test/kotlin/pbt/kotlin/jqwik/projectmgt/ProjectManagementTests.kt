@@ -1,7 +1,6 @@
 package pbt.kotlin.jqwik.projectmgt
 
 import net.jqwik.api.Example
-import org.assertj.core.api.Assertions.assertThat
 
 class ProjectManagementTests {
 
@@ -14,9 +13,9 @@ class ProjectManagementTests {
         project.addMember(alex)
         project.addMember(kim)
         project.addMember(pat)
-        assertThat(project.isMember(alex)).isTrue
-        assertThat(project.isMember(kim)).isTrue
-        assertThat(project.isMember(pat)).isTrue
+        assert(project.isMember(alex))
+        assert(project.isMember(kim))
+        assert(!project.isMember(pat))
     }
 
 }
