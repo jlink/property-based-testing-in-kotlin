@@ -1,13 +1,13 @@
 package pbt.kotlin.jqwik.projectmgt
 
-import net.jqwik.api.*
+import net.jqwik.api.ForAll
+import net.jqwik.api.Property
+import net.jqwik.api.Provide
 import net.jqwik.api.constraints.NotBlank
-import net.jqwik.api.constraints.NumericChars
 import net.jqwik.api.constraints.Size
 import net.jqwik.api.constraints.UniqueElements
 import net.jqwik.web.api.Email
 import net.jqwik.web.api.Web
-import org.assertj.core.api.Assertions.assertThat
 
 class ProjectManagementProperties {
 
@@ -23,7 +23,7 @@ class ProjectManagementProperties {
             project.addMember(user)
         }
         for (user in users) {
-            assertThat(project.isMember(user)).isTrue
+            assert(project.isMember(user))
         }
     }
 
@@ -35,7 +35,7 @@ class ProjectManagementProperties {
             project.addMember(user)
         }
         for (user in users) {
-            assertThat(project.isMember(user)).isTrue
+            assert(project.isMember(user))
         }
     }
 

@@ -19,9 +19,9 @@ class User(email: String) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
-        val user = other as User
-        return email == user.email
+        if (other === null) return false
+        if (other !is User) return false
+        return email == other.email
     }
 
     override fun hashCode() = email.hashCode()

@@ -34,4 +34,5 @@ class Project constructor(name: String, membersLimit: Int = 10) {
 
     private fun emailKnown(email: String): Boolean = members.any { m -> m.email == email }
 
+    override fun toString() = "Project<$name>"
 }

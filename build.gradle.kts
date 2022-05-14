@@ -8,6 +8,7 @@ buildscript {
 
 plugins {
     kotlin("jvm") version "1.6.20"
+    id("com.bnorm.power.kotlin-power-assert") version "0.11.0"
 }
 
 repositories {
@@ -40,9 +41,9 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf(
-			"-Xjsr305=strict", // Required for strict interpretation of
-			"-Xemit-jvm-type-annotations" // Required for annotations on type variables
-		)
+            "-Xjsr305=strict", // Required for strict interpretation of
+            "-Xemit-jvm-type-annotations" // Required for annotations on type variables
+        )
         jvmTarget = "17" // 1.8 or above
         javaParameters = true // Required to get correct parameter names in reporting
     }
@@ -50,4 +51,13 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Wrapper> {
     gradleVersion = "7.4.2"
+}
+
+configure<com.bnorm.power.PowerAssertGradleExtension> {
+    functions = listOf(
+        "kotlin.assert",
+        "kotlin.require",
+        "kotlin.check",
+        "kotlin.test.assertTrue"
+    )
 }
