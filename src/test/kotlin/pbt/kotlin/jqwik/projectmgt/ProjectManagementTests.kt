@@ -15,7 +15,7 @@ class ProjectManagementTests {
         project.addMember(pat)
         assert(project.isMember(alex))
         assert(project.isMember(kim))
-        assert(!project.isMember(pat))
+        assert(project.isMember(pat))
     }
 
 }
