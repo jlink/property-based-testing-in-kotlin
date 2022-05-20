@@ -1,6 +1,6 @@
 # Property-based Testing in Kotlin
 
-#### Last Update: May 10, 2022
+#### Last Update: May 20, 2022
 
 Kotlin is currently the most hyped language on the JVM. With good reason.
 Most parts of Kotlin are fully compatible with Java. 
@@ -16,6 +16,12 @@ Some of the few articles and resources I found are
 __This article__ wants to fill the gap a little bit. 
 It covers the application of PBT in Kotlin using 
 [jqwik](https://jqwik.net) and [jqwik's Kotlin module](https://jqwik.net/docs/current/user-guide.html#kotlin-module).
+
+#### Update
+
+In May 2022 I was a guest on JetBrains' Kotlin YouTube channel talking about the PBT with Kotlin.
+You may want to [watch the recording](https://www.youtube.com/watch?v=dPhZIo27fYE) 
+hopefully being motivated by it to read on.
 
 <!-- Generated toc must be stripped of `nbsp` occurrences in links -->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
