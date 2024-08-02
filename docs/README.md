@@ -1,6 +1,6 @@
 # Property-based Testing in Kotlin
 
-#### Last Update: July 30, 2024
+#### Last Update: August 2, 2024
 
 Kotlin is currently the most hyped language on the JVM. With good reason.
 Most parts of Kotlin are fully compatible with Java. 
@@ -18,11 +18,18 @@ __This article__ wants to fill the gap a little bit.
 It covers the application of PBT in Kotlin using 
 [jqwik](https://jqwik.net) and [jqwik's Kotlin module](https://jqwik.net/docs/current/user-guide.html#kotlin-module).
 
-#### Update
+#### Update 1
 
 In May 2022 I was a guest on JetBrains' Kotlin YouTube channel talking about the PBT with Kotlin.
 You may want to [watch the recording](https://www.youtube.com/watch?v=dPhZIo27fYE) 
 hopefully being motivated by it to read on.
+
+#### Update 2
+
+As of jqwik version `1.9.0` the kotlin module supports Kotlin 2.0 - including the new K2 compiler.
+Among other things, this requires a different parameter to handle nullability annotations correctly.
+See [configuration](#setting-up-jqwik-for-kotlin) for details.
+
 
 <!-- Generated toc must be stripped of `nbsp` occurrences in links -->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -185,7 +192,9 @@ Here's how you can do that in a Gradle build file using the Kotlin syntax:
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf(
-		  "-Xjsr305=strict", // Strict interpretation of nullability annotations in jqwik API
+          // Strict interpretation of nullability annotations in jqwik API
+		  "-Xjsr305=strict", // For jqwik < 1.9.0
+		  "-Xnullability-annotations=@org.jspecify.annotations:strict" // For jqwik >= 1.9.0
 		  "-Xemit-jvm-type-annotations" // Enable nnotations on type variables
 		)
         jvmTarget = "17" // 1.8 or above
